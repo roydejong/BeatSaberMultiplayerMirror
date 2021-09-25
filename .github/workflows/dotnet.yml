@@ -28,5 +28,5 @@ jobs:
     - name: Upload build artifact
       uses: actions/upload-artifact@v1
       with:
-        name: ${{ steps.Build.outputs.filename }}
-        path: ${{ steps.Build.outputs.artifactpath }}
+        name: MultiplayerMirror
+        path: bin/Debug/net472/Final
