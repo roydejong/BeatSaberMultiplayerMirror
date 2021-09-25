@@ -40,11 +40,11 @@ namespace MultiplayerMirror.Core
                 _mockPlayer = CreateMockPlayer(_localPlayer);
                 e.AvatarManager.AddPlayer(_mockPlayer);
             }
-            else if (e.Player == _mockPlayer && e.AvatarController is not null)
+            else if (_localPlayer is not null && e.Player == _mockPlayer && e.AvatarController is not null)
             {
                 // Mock player / clone avatar was just created by us
                 _mockPlayerAvatarController = e.AvatarController;
-                ConfigureMockPlayer(_mockPlayer, e.AvatarController);
+                ConfigureMockPlayer(_localPlayer, _mockPlayer, e.AvatarController);
             }
         }
         #endregion
@@ -71,22 +71,33 @@ namespace MultiplayerMirror.Core
             return _mockPlayer;
         }
 
-        private void ConfigureMockPlayer(MockPlayer player, MultiplayerLobbyAvatarController avatarController)
+        private void ConfigureMockPlayer(IConnectedPlayer basePlayer, MockPlayer mockPlayer,
+            MultiplayerLobbyAvatarController avatarController)
         {
             var tfAvatar = avatarController.gameObject.transform;
-            
+
             // Tweak position and rotation so it faces the local player
             avatarController.ShowSpawnAnimation(new Vector3(0.0f, 0.0f, 3.0f),
-                    new Quaternion(0f, 180f, 0f, 0f));
-            
+                new Quaternion(0f, 180f, 0f, 0f));
+
             // Disable name tag (to avoid timing issues with spawn coroutine, just disable all its children)
             foreach (Transform tfChild in tfAvatar.Find("AvatarCaption"))
                 tfChild.gameObject.SetActive(false);
-            
+
             // Connect player movement
-            // TODO ...
+            var multiplayerAvatarPoseController =
+                avatarController.gameObject.GetComponent<MultiplayerAvatarPoseController>();
+            multiplayerAvatarPoseController.connectedPlayer = basePlayer;
+
+            var internalAvatarPoseController =
+                multiplayerAvatarPoseController.GetField<AvatarPoseController, MultiplayerAvatarPoseController>(
+                    "_avatarPoseController");
+
+            // Enable actual mirror effect - this script mirrors position and rotation
+            var avatarPoseMirror = avatarController.gameObject.AddComponent<AvatarPoseMirror>();
+            avatarPoseMirror.SetField("_avatarPoseController", internalAvatarPoseController);
         }
-        
+
         private void CleanUpMockPlayer()
         {
             if (_mockPlayerAvatarController is not null)
