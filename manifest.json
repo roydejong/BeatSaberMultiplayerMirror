@@ -1,0 +1,16 @@
+﻿{
+  "$schema": "https://raw.githubusercontent.com/bsmg/BSIPA-MetadataFileSchema/master/Schema.json",
+  "id": "MultiplayerMirror",
+  "name": "MultiplayerMirror",
+  "author": "LookAtHippo",
+  "version": "0.1.0",
+  "description": "Adds mirror options for your multiplayer avatar.",
+  "gameVersion": "1.18.0",
+  "dependsOn": {
+    "BSIPA": "^4.2.0"
+  },
+  "links": {
+    "project-home": "https://github.com/roydejong/BeatSaberMultiplayerMirror",
+    "project-source": "https://github.com/roydejong/BeatSaberMultiplayerMirror"
+  }
+}
