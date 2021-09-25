@@ -1,0 +1,36 @@
+name: .NET Build
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Download stripped game references
+      env:
+        FILES_URL: ${{ secrets.BSFILES_URL }}
+      run: wget "$FILES_URL" -q -O bsfiles.zip
+    - name: Extract stripped game references
+      run: unzip -q -n bsfiles.zip -d ./Refs
+    - name: Download BeatMods dependencies
+      uses: Goobwabber/download-beatmods-deps@1.1
+      with:
+        manifest: ./manifest.json
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: ${{ steps.Build.outputs.filename }}
+        path: ${{ steps.Build.outputs.artifactpath }}
