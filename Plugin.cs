@@ -1,40 +1,56 @@
 ﻿using System.Reflection;
 using IPA;
 using IPA.Config.Stores;
+using MultiplayerMirror.Core;
 using IPALogger = IPA.Logging.Logger;
 
 namespace MultiplayerMirror
 {
-    [Plugin(RuntimeOptions.SingleStartInit)]
+    [Plugin(RuntimeOptions.DynamicInit)]
     public class Plugin
     {
         public const string HarmonyId = "mod.multiplayermirror";
 
-        internal static Plugin? Instance { get; private set; }
         internal static IPALogger? Log { get; private set; }
         internal static PluginConfig? Config { get; private set; }
 
-        internal static HarmonyLib.Harmony? Harmony { get; private set; }
-
+        private HarmonyLib.Harmony? _harmony;
+        
+        private LobbyMirror? _lobbyMirror;
+        private HologramMirror? _hologramMirror;
+        
         [Init]
         public void Init(IPALogger logger, IPA.Config.Config config)
         {
-            Instance = this;
             Log = logger;
             Config = config.Generated<PluginConfig>();
+
+            _harmony = new HarmonyLib.Harmony(HarmonyId);
+            
+            _lobbyMirror = new LobbyMirror();
+            _hologramMirror = new HologramMirror();
         }
 
-        [OnStart]
-        public void OnApplicationStart()
+        [OnEnable]
+        public void OnEnable()
         {
-            Harmony = new HarmonyLib.Harmony(HarmonyId);
-            Harmony.PatchAll(Assembly.GetExecutingAssembly());
+            // Install Harmony patches
+            _harmony?.PatchAll(Assembly.GetExecutingAssembly());
+
+            // Setup core components
+            _hologramMirror?.SetUp();
+            _lobbyMirror?.SetUp();
         }
 
-        [OnExit]
-        public void OnApplicationQuit()
+        [OnDisable]
+        public void OnDisable()
         {
-   
+            // Shut down core components
+            _hologramMirror?.TearDown();
+            _lobbyMirror?.TearDown();
+            
+            // Remove Harmony patches
+            _harmony?.UnpatchSelf();
         }
     }
 }
