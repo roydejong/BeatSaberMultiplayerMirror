@@ -1,5 +1,6 @@
 ﻿using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
+using MultiplayerMirror.Events;
 
 namespace MultiplayerMirror.UI
 {
@@ -14,6 +15,7 @@ namespace MultiplayerMirror.UI
             {
                 Plugin.Config!.EnableLobbyMirror = value;
                 NotifyPropertyChanged();
+                ModEvents.RaiseConfigChanged(this);
             }
         } 
         
@@ -25,6 +27,7 @@ namespace MultiplayerMirror.UI
             {
                 Plugin.Config!.EnableSelfHologram = value;
                 NotifyPropertyChanged();
+                ModEvents.RaiseConfigChanged(this);
             }
         } 
         
@@ -36,6 +39,7 @@ namespace MultiplayerMirror.UI
             {
                 Plugin.Config!.ForceSelfHologram = value;
                 NotifyPropertyChanged();
+                ModEvents.RaiseConfigChanged(this);
             }
         } 
         #endregion

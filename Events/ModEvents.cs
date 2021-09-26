@@ -1,10 +1,21 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using MultiplayerMirror.Events.Models;
 
 namespace MultiplayerMirror.Events
 {
     internal static class ModEvents
     {
+        #region ConfigChanged
+        /// <summary>
+        /// This event is raised when a property in the mod's config was changed.
+        /// </summary>
+        internal static event EventHandler<string>? ConfigChanged;
+
+        internal static void RaiseConfigChanged(object sender, [CallerMemberName] string propertyName = "") =>
+            ConfigChanged.RaiseEventSafe(sender, propertyName);
+        #endregion
+        
         #region LobbyAvatarCreated
         /// <summary>
         /// This event is raised when an avatar has been created in the lobby.

@@ -15,11 +15,13 @@ namespace MultiplayerMirror.Core
         #region Setup
         public void SetUp()
         {
+            ModEvents.ConfigChanged += OnConfigChanged;
             ModEvents.LobbyAvatarCreated += OnLobbyAvatarCreated;
         }
 
         public void TearDown()
         {
+            ModEvents.ConfigChanged -= OnConfigChanged;
             ModEvents.LobbyAvatarCreated -= OnLobbyAvatarCreated;
             
             CleanUpMockPlayer();
@@ -27,6 +29,11 @@ namespace MultiplayerMirror.Core
         #endregion
 
         #region Events
+        private void OnConfigChanged(object sender, string propertyName)
+        {
+            SyncConfigSetting();
+        }
+        
         private void OnLobbyAvatarCreated(object sender, LobbyAvatarCreatedEventArgs e)
         {
             Plugin.Log?.Critical($"LobbyMirror - OnLobbyAvatarCreated - {e.Player.userId} - {e.Player.userName}");
@@ -50,6 +57,15 @@ namespace MultiplayerMirror.Core
         #endregion
         
         #region Avatar Logic
+        private void SyncConfigSetting()
+        {
+            if (_mockPlayerAvatarController is null)
+                return;
+
+            var active = Plugin.Config is not null && Plugin.Config.EnableLobbyMirror;
+            _mockPlayerAvatarController.gameObject.SetActive(active);
+        }
+        
         private MockPlayer CreateMockPlayer(IConnectedPlayer basePlayer)
         {
             CleanUpMockPlayer(); 
@@ -96,6 +112,8 @@ namespace MultiplayerMirror.Core
             // Enable actual mirror effect - this script mirrors position and rotation
             var avatarPoseMirror = avatarController.gameObject.AddComponent<AvatarPoseMirror>();
             avatarPoseMirror.SetField("_avatarPoseController", internalAvatarPoseController);
+            
+            SyncConfigSetting();
         }
 
         private void CleanUpMockPlayer()

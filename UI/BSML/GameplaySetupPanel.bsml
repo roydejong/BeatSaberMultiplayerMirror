@@ -24,7 +24,7 @@
       value="ForceSelfHologram"
       on-change="SetForceSelfHologram"
       bind-value="true"
-      text="Force show Self Hologram          "
+      text="Force show Self Hologram"
       hover-hint="Always show a mirror hologram of yourself during gameplay, no matter what place you're in."
     />
     

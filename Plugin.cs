@@ -8,7 +8,7 @@ using IPALogger = IPA.Logging.Logger;
 
 namespace MultiplayerMirror
 {
-    [Plugin(RuntimeOptions.SingleStartInit)]
+    [Plugin(RuntimeOptions.DynamicInit)]
     public class Plugin
     {
         public const string HarmonyId = "mod.multiplayermirror";
@@ -33,8 +33,8 @@ namespace MultiplayerMirror
             _hologramMirror = new HologramMirror();
         }
         
-        [OnStart]
-        public void OnApplicationStart()
+        [OnEnable]
+        public void OnEnable()
         {
             // Install Harmony patches
             _harmony?.PatchAll(Assembly.GetExecutingAssembly());
@@ -52,9 +52,12 @@ namespace MultiplayerMirror
             );
         }
         
-        [OnExit]
-        public void OnApplicationQuit()
+        [OnDisable]
+        public void OnDisable()
         {
+            // Remove gameplay setup tab
+            GameplaySetup.instance.RemoveTab("Multiplayer Mirror");
+            
             // Shut down core components
             _hologramMirror?.TearDown();
             _lobbyMirror?.TearDown();
