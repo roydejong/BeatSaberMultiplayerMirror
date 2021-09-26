@@ -2,6 +2,7 @@
 using IPA.Utilities;
 using MultiplayerMirror.Events;
 using MultiplayerMirror.Events.Models;
+using UnityEngine;
 
 namespace MultiplayerMirror.Core
 {
@@ -9,6 +10,8 @@ namespace MultiplayerMirror.Core
     {
         private IConnectedPlayer? _localPlayer;
         private MultiplayerScoreProvider.RankedPlayer? _rankedLocalPlayer;
+        private MultiplayerConnectedPlayerFacade? _mirrorFacade;
+        private Transform? _tfSelfBigAvatar;
 
         #region Setup
         public void SetUp()
@@ -30,17 +33,28 @@ namespace MultiplayerMirror.Core
             // All players just spawned in gameplay, grab a reference to the local player
             _localPlayer = null;
             _rankedLocalPlayer = null;
+            _mirrorFacade = null;
+            _tfSelfBigAvatar = null;
+
+            if (!(Plugin.Config?.EnableSelfHologram ?? false))
+                // Self-hologram option is not enabled, don't do anything
+                return;
+            
+            if (e.LocalStartState == MultiplayerPlayerStartState.Late)
+                // We connected late, don't do anything
+                return;
             
             foreach (var player in e.ActivePlayers)
-            {
-                if (player.isConnectionOwner)
-                    continue;
-
-                if (player.isMe) // TODO remove
-                    continue;  
-                
-                _localPlayer = player;
-            } 
+                if (player.isMe)
+                    _localPlayer = player;
+            
+            if (_localPlayer is null)
+                // Local player is not active
+                return;
+            
+            // Create a facade for ourselves - which is normally used to represent remote players
+            // This effectively renders us in our own place with big avatar support
+            CreatePlayerMirrorFacade(e.PlayersManager, _localPlayer);
         }
 
         private void OnFirstPlayerDidChange(object sender, FirstPlayerDidChangeEventArgs e)
@@ -51,10 +65,11 @@ namespace MultiplayerMirror.Core
                 // Self-hologram option is not enabled, we don't need to do anything
                 return;
 
-            if (_localPlayer == null || !_localPlayer.IsActiveOrFinished())
-                // Players haven't spawned yet, or the local player is not active
+            if (_localPlayer == null)
+                // Players haven't spawned yet, or local player was not active at start
                 return;
 
+            // Get reference to "ranked" local player if we don't have it yet
             if (_rankedLocalPlayer is null)
             {
                 var scoreProvider =
@@ -68,15 +83,62 @@ namespace MultiplayerMirror.Core
                 }
             }
 
-            if (_rankedLocalPlayer == null)
-                // Failed to get ranked local player - this should not happen
-                return;
-            
-            if (Plugin.Config.ForceSelfHologram && e.FirstPlayer != _rankedLocalPlayer)
+            var weAreLeading = e.FirstPlayer is not null && e.FirstPlayer.userId == _localPlayer.userId;
+
+            if (Plugin.Config.ForceSelfHologram && _rankedLocalPlayer is not null && e.FirstPlayer != _rankedLocalPlayer)
             {
                 // Force mode: set local player to always be in 1st place, even when they're not
-                Plugin.Log?.Warn($"Force HandleFirstPlayerDidChange - {_rankedLocalPlayer.userName}");
+                Plugin.Log?.Debug($"[HologramMirror] Created mirror facade for local player");
                 e.LeadPlayerProvider.HandleFirstPlayerDidChange(_rankedLocalPlayer);
+                weAreLeading = true;
+            }
+            
+            // Toggle self hologram if we are leading currently (forced or otherwise)
+            if (_tfSelfBigAvatar is not null)
+                _tfSelfBigAvatar.gameObject.SetActive(weAreLeading);
+        }
+        #endregion
+
+        #region Mirror
+        private void CreatePlayerMirrorFacade(MultiplayerPlayersManager playersManager, IConnectedPlayer localPlayer)
+        {
+            var connectedPlayerFactory =
+                playersManager.GetField<MultiplayerConnectedPlayerFacade.Factory, MultiplayerPlayersManager>(
+                    "_connectedPlayerFactory");
+
+            if (connectedPlayerFactory is null)
+                return;
+
+            // Create a "remote player" facade for the local player 
+            _mirrorFacade = connectedPlayerFactory.Create(_localPlayer, MultiplayerPlayerStartState.InSync);
+            Plugin.Log?.Debug($"[HologramMirror] Created mirror facade for local player");
+            
+            // Get reference to the big avatar; disable every other object
+            _tfSelfBigAvatar = null;
+            
+            foreach (Transform t in _mirrorFacade.transform)
+            {
+                if (t.name == "MultiplayerGameBigAvatar")
+                    _tfSelfBigAvatar = t;
+                
+                t.gameObject.SetActive(false);
+            }
+
+            if (_tfSelfBigAvatar is not null)
+            {
+                // Rotate big avatar so it faces the player
+                _tfSelfBigAvatar.Rotate(0f, 180f, 0f);
+                _tfSelfBigAvatar.position = new Vector3(0f, 0f, 50f);
+                
+                // Add mirror script to the pose controller
+                var multiplayerAvatarPoseController = _tfSelfBigAvatar.GetComponent<MultiplayerAvatarPoseController>();
+                
+                var internalAvatarPoseController =
+                    multiplayerAvatarPoseController.GetField<AvatarPoseController, MultiplayerAvatarPoseController>(
+                        "_avatarPoseController");
+                
+                var avatarPoseMirror = _tfSelfBigAvatar.gameObject.AddComponent<AvatarPoseMirror>();
+                avatarPoseMirror.SetField("_avatarPoseController", internalAvatarPoseController);
             }
         }
         #endregion
