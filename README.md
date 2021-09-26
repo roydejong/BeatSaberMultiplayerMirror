@@ -1,2 +1,31 @@
-# Beat Saber Multiplayer Mirror
+# MultiplayerMirror
 **Beat Saber mod that adds mirror options for your multiplayer avatar.**
+
+Do you want to see if you look as cool in multiplayer as you think you do? Have you ever wanted to kiss your own avatar? This may be the mod for you!
+
+## Features
+MultiplayerMirror adds options for mirroring your own avatar while in multiplayer.
+
+You can toggle the options in the mod's gameplay modifiers panel on the left.
+
+#### Toggle Lobby Mirror
+Show a mirror avatar of yourself in the lobby.
+
+#### Enable Self Hologram
+When you're in 1st place during gameplay, show a mirror hologram of yourself.
+
+#### Force show Self Hologram
+Always show a mirror hologram of yourself during gameplay, no matter what place you're in.
+
+*Note: The hologram mirror only works for the Arena, not [yet] for 1v1 Duels.*
+
+## Installation
+Download the mod and place it in your Beat Saber `Plugins` folder.
+
+### Download
+You can download the [**✅ Latest Stable Release**](https://github.com/roydejong/BeatSaberMultiplayerMirror/releases/latest) or [**🔧 Development Build**](https://github.com/roydejong/BeatSaberMultiplayerMirror/actions/workflows/dotnet.yml?query=is%3Asuccess+branch%3Amain) from GitHub.
+
+### Requirements
+- Beat Saber 1.18.0 or compatible
+- BSIPA 4.2.0
+- BeatSaberMarkupLanguage 1.5.8
