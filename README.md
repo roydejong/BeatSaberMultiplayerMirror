@@ -6,7 +6,9 @@ Do you want to see if you look as cool in multiplayer as you think you do? Have 
 ## Features
 MultiplayerMirror adds options for mirroring your own avatar while in multiplayer.
 
-You can toggle the options in the mod's gameplay modifiers panel on the left.
+These effects are only visible to you. They work on any multiplayer server and lobby type.
+
+You can toggle these options in the mod's gameplay modifiers panel (on the left, under *Mods* → *Multiplayer Mirror*).
 
 #### Toggle Lobby Mirror
 Show a mirror avatar of yourself in the lobby.

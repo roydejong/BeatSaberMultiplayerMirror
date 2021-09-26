@@ -39,8 +39,6 @@ namespace MultiplayerMirror.Core
         
         private void OnLobbyAvatarCreated(object sender, LobbyAvatarCreatedEventArgs e)
         {
-            Plugin.Log?.Critical($"LobbyMirror - OnLobbyAvatarCreated - {e.Player.userId} - {e.Player.userName}");
-
             if (e.Player.isMe)
             {
                 // Local player was just added to the lobby 

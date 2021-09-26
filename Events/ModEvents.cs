@@ -26,13 +26,33 @@ namespace MultiplayerMirror.Events
             LobbyAvatarCreated.RaiseEventSafe(sender, e);
         #endregion
         
+        #region PlayersSpawned
+        /// <summary>
+        /// This event is raised when the players were spawned in gameplay.
+        /// </summary>
+        internal static event EventHandler<PlayersSpawnedEventArgs>? PlayersSpawned;
+
+        internal static void RaisePlayersSpawned(object sender, PlayersSpawnedEventArgs e) =>
+            PlayersSpawned.RaiseEventSafe(sender, e);
+        #endregion
+        
+        #region FirstPlayerDidChange
+        /// <summary>
+        /// This event is raised when the player in 1st position changes during a multiplayer match.
+        /// </summary>
+        internal static event EventHandler<FirstPlayerDidChangeEventArgs>? FirstPlayerDidChange;
+
+        internal static void RaiseFirstPlayerDidChange(object sender, FirstPlayerDidChangeEventArgs e) =>
+            FirstPlayerDidChange.RaiseEventSafe(sender, e);
+        #endregion
+        
         #region Helper code
         private static void RaiseEventSafe<TArgs>(this EventHandler<TArgs>? e, object sender, TArgs args)
         {
             if (e is null)
                 return;
             
-            Plugin.Log?.Info($"[ModEvents] {e.Method.Name} ({args})");
+            Plugin.Log?.Warn($"[ModEvents] {e.Method.Name} ({args})");
             
             foreach (var invocation in e.GetInvocationList())
             {
