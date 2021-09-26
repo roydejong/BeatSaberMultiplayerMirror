@@ -119,8 +119,13 @@ namespace MultiplayerMirror.Core
             foreach (Transform t in _mirrorFacade.transform)
             {
                 if (t.name == "MultiplayerGameBigAvatar")
+                {
                     _tfSelfBigAvatar = t;
-                
+                    // Make our hologram visible from the start if force mode is on
+                    t.gameObject.SetActive(Plugin.Config?.ForceSelfHologram ?? false);
+                    continue;
+                }
+
                 t.gameObject.SetActive(false);
             }
 
@@ -128,7 +133,7 @@ namespace MultiplayerMirror.Core
             {
                 // Rotate big avatar so it faces the player
                 _tfSelfBigAvatar.Rotate(0f, 180f, 0f);
-                _tfSelfBigAvatar.position = new Vector3(0f, 0f, 50f);
+                _tfSelfBigAvatar.position = new Vector3(0f, -1.5f, 50f);
                 
                 // Add mirror script to the pose controller
                 var multiplayerAvatarPoseController = _tfSelfBigAvatar.GetComponent<MultiplayerAvatarPoseController>();
