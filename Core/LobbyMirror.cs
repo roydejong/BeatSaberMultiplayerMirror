@@ -8,10 +8,13 @@ namespace MultiplayerMirror.Core
 {
     public class LobbyMirror
     {
+        private static readonly Vector3 MirrorSpawnPos = new Vector3(0.0f, 0.0f, 3.0f);
+        private static readonly Quaternion MirrorSpawnRot = new Quaternion(0f, 180f, 0f, 0f);
+        
         private IConnectedPlayer? _localPlayer;
         private MockPlayer? _mockPlayer;
         private MultiplayerLobbyAvatarController? _mockPlayerAvatarController;
-        
+
         #region Setup
         public void SetUp()
         {
@@ -62,8 +65,18 @@ namespace MultiplayerMirror.Core
             if (_mockPlayerAvatarController is null)
                 return;
 
-            var active = Plugin.Config is not null && Plugin.Config.EnableLobbyMirror;
-            _mockPlayerAvatarController.gameObject.SetActive(active);
+            var wasActive = _mockPlayerAvatarController.gameObject.activeSelf;
+            var makeActive = Plugin.Config is not null && Plugin.Config.EnableLobbyMirror;
+
+            if (!wasActive && makeActive)
+            {
+                _mockPlayerAvatarController.gameObject.SetActive(true);
+                _mockPlayerAvatarController.ShowSpawnAnimation(MirrorSpawnPos, MirrorSpawnRot);
+            }
+            else if (wasActive && !makeActive)
+            {
+                _mockPlayerAvatarController.gameObject.SetActive(false);
+            }
         }
         
         private MockPlayer CreateMockPlayer(IConnectedPlayer basePlayer)
@@ -93,8 +106,7 @@ namespace MultiplayerMirror.Core
             var tfAvatar = avatarController.gameObject.transform;
 
             // Tweak position and rotation so it faces the local player
-            avatarController.ShowSpawnAnimation(new Vector3(0.0f, 0.0f, 3.0f),
-                new Quaternion(0f, 180f, 0f, 0f));
+            avatarController.ShowSpawnAnimation(MirrorSpawnPos, MirrorSpawnRot);
 
             // Disable name tag (to avoid timing issues with spawn coroutine, just disable all its children)
             foreach (Transform tfChild in tfAvatar.Find("AvatarCaption"))
