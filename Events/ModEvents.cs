@@ -52,7 +52,7 @@ namespace MultiplayerMirror.Events
             if (e is null)
                 return;
             
-            Plugin.Log?.Warn($"[ModEvents] {e.Method.Name} ({args})");
+            Plugin.Log?.Debug($"[ModEvents] {e.Method.Name} ({args})");
             
             foreach (var invocation in e.GetInvocationList())
             {

@@ -88,7 +88,6 @@ namespace MultiplayerMirror.Core
             if (Plugin.Config.ForceSelfHologram && _rankedLocalPlayer is not null && e.FirstPlayer != _rankedLocalPlayer)
             {
                 // Force mode: set local player to always be in 1st place, even when they're not
-                Plugin.Log?.Debug($"[HologramMirror] Created mirror facade for local player");
                 e.LeadPlayerProvider.HandleFirstPlayerDidChange(_rankedLocalPlayer);
                 weAreLeading = true;
             }
