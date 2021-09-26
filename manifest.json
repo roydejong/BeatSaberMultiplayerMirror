@@ -7,7 +7,8 @@
   "description": "Adds mirror options for your multiplayer avatar.",
   "gameVersion": "1.18.0",
   "dependsOn": {
-    "BSIPA": "^4.2.0"
+    "BSIPA": "^4.2.0",
+    "BeatSaberMarkupLanguage": "^1.5.8"
   },
   "links": {
     "project-home": "https://github.com/roydejong/BeatSaberMultiplayerMirror",

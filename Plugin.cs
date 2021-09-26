@@ -1,12 +1,14 @@
 ﻿using System.Reflection;
+using BeatSaberMarkupLanguage.GameplaySetup;
 using IPA;
 using IPA.Config.Stores;
 using MultiplayerMirror.Core;
+using MultiplayerMirror.UI;
 using IPALogger = IPA.Logging.Logger;
 
 namespace MultiplayerMirror
 {
-    [Plugin(RuntimeOptions.DynamicInit)]
+    [Plugin(RuntimeOptions.SingleStartInit)]
     public class Plugin
     {
         public const string HarmonyId = "mod.multiplayermirror";
@@ -30,9 +32,9 @@ namespace MultiplayerMirror
             _lobbyMirror = new LobbyMirror();
             _hologramMirror = new HologramMirror();
         }
-
-        [OnEnable]
-        public void OnEnable()
+        
+        [OnStart]
+        public void OnApplicationStart()
         {
             // Install Harmony patches
             _harmony?.PatchAll(Assembly.GetExecutingAssembly());
@@ -40,10 +42,18 @@ namespace MultiplayerMirror
             // Setup core components
             _hologramMirror?.SetUp();
             _lobbyMirror?.SetUp();
+            
+            // Add gameplay setup tab
+            GameplaySetup.instance.AddTab(
+                name: "Multiplayer Mirror", 
+                resource: "MultiplayerMirror.UI.BSML.GameplaySetupPanel.bsml",
+                host: GameplaySetupPanel.instance,
+                menuType: MenuType.Online
+            );
         }
-
-        [OnDisable]
-        public void OnDisable()
+        
+        [OnExit]
+        public void OnApplicationQuit()
         {
             // Shut down core components
             _hologramMirror?.TearDown();
