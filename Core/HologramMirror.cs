@@ -2,6 +2,7 @@
 using IPA.Utilities;
 using MultiplayerMirror.Events;
 using MultiplayerMirror.Events.Models;
+using Tweening;
 using UnityEngine;
 
 namespace MultiplayerMirror.Core
@@ -12,6 +13,7 @@ namespace MultiplayerMirror.Core
         private MultiplayerScoreProvider.RankedPlayer? _rankedLocalPlayer;
         private MultiplayerConnectedPlayerFacade? _mirrorFacade;
         private Transform? _tfSelfBigAvatar;
+        private MultiplayerBigAvatarAnimator? _bigAvatarAnimator;
 
         #region Setup
         public void SetUp()
@@ -35,6 +37,7 @@ namespace MultiplayerMirror.Core
             _rankedLocalPlayer = null;
             _mirrorFacade = null;
             _tfSelfBigAvatar = null;
+            _bigAvatarAnimator = null;
 
             if (!(Plugin.Config?.EnableSelfHologram ?? false))
                 // Self-hologram option is not enabled, don't do anything
@@ -94,7 +97,13 @@ namespace MultiplayerMirror.Core
             
             // Toggle self hologram if we are leading currently (forced or otherwise)
             if (_tfSelfBigAvatar is not null)
-                _tfSelfBigAvatar.gameObject.SetActive(weAreLeading);
+                _tfSelfBigAvatar.gameObject.SetActive(true);
+            
+            if (_bigAvatarAnimator is not null)
+                if (weAreLeading)
+                    _bigAvatarAnimator.Animate(true, 0.3f, EaseType.OutBack);
+                else
+                    _bigAvatarAnimator.Animate(false, 0.15f, EaseType.OutQuad);
         }
         #endregion
 
@@ -107,7 +116,7 @@ namespace MultiplayerMirror.Core
 
             if (connectedPlayerFactory is null)
                 return;
-
+            
             // Create a "remote player" facade for the local player 
             _mirrorFacade = connectedPlayerFactory.Create(_localPlayer, MultiplayerPlayerStartState.InSync);
             Plugin.Log?.Debug($"[HologramMirror] Created mirror facade for local player");
@@ -120,16 +129,19 @@ namespace MultiplayerMirror.Core
                 if (t.name == "MultiplayerGameBigAvatar")
                 {
                     _tfSelfBigAvatar = t;
-                    // Make our hologram visible from the start if force mode is on
-                    t.gameObject.SetActive(Plugin.Config?.ForceSelfHologram ?? false);
+                    t.gameObject.SetActive(true);
                     continue;
                 }
 
                 t.gameObject.SetActive(false);
             }
+            
+            _bigAvatarAnimator = null;
 
             if (_tfSelfBigAvatar is not null)
             {
+                _bigAvatarAnimator = _tfSelfBigAvatar.GetComponent<MultiplayerBigAvatarAnimator>();
+                
                 // Rotate big avatar so it faces the player
                 _tfSelfBigAvatar.Rotate(0f, 180f, 0f);
                 _tfSelfBigAvatar.position = new Vector3(0f, -1.5f, 50f);
@@ -143,6 +155,16 @@ namespace MultiplayerMirror.Core
                 
                 var avatarPoseMirror = _tfSelfBigAvatar.gameObject.AddComponent<AvatarPoseMirror>();
                 avatarPoseMirror.SetField("_avatarPoseController", internalAvatarPoseController);
+            }
+
+            if (_bigAvatarAnimator is not null)
+            {
+                _bigAvatarAnimator.HideInstant();
+                
+                if (Plugin.Config?.ForceSelfHologram ?? false)
+                {
+                    _bigAvatarAnimator.Animate(true, 1f, EaseType.OutBack);
+                }
             }
         }
         #endregion
