@@ -36,7 +36,7 @@
       on-change="SetInvertMirror"
       bind-value="true"
       text="Invert mirror"
-      hover-hint="Invert the mirrored avatar, so left/right positions are flipped. Affects lobby and hologram."
+      hover-hint="Invert your mirrored avatar, so left/right positions are flipped, like it is on the results screen."
     />
     
   </modifier-container>
