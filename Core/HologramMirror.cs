@@ -166,6 +166,7 @@ namespace MultiplayerMirror.Core
                 
                 if (Plugin.Config?.ForceSelfHologram ?? false)
                 {
+                    _bigAvatarAnimator.name = "MultiplayerMirrorHologramAnimator";
                     _bigAvatarAnimator.Animate(true, 1f, EaseType.OutBack);
                 }
             }
