@@ -21,13 +21,21 @@ When you're in 1st place during gameplay, show a mirror hologram of yourself.
 #### Force show Self Hologram
 Always show a mirror hologram of yourself during gameplay, no matter what place you're in.
 
+#### Invert mirror
+If enabled, flip left/right positions, like on the results screen. Affects both the lobby and hologram mirrors. 
+
 ## Installation
-Download the mod and place it in your Beat Saber `Plugins` folder.
+Download the mod, and place `MultiplayerMirror.dll` in your Beat Saber `Plugins` folder.
 
 ### Download
-You can download the [**✅ Latest Stable Release**](https://github.com/roydejong/BeatSaberMultiplayerMirror/releases/latest) or [**🔧 Development Build**](https://github.com/roydejong/BeatSaberMultiplayerMirror/actions/workflows/dotnet.yml?query=is%3Asuccess+branch%3Amain) from GitHub.
+You can download the [**✅ Latest Stable Release**](https://github.com/roydejong/BeatSaberMultiplayerMirror/releases/latest) or a [**☠ Development Build**](https://github.com/roydejong/BeatSaberMultiplayerMirror/actions/workflows/dotnet.yml?query=is%3Asuccess+branch%3Amain) from GitHub.
 
 ### Requirements
 - Beat Saber 1.18.0 or compatible
-- BSIPA 4.2.0
-- BeatSaberMarkupLanguage 1.5.8
+- Mods installed with [Mod Assistant](https://github.com/Assistant/ModAssistant):
+  - BSIPA 4.2.0+
+  - BeatSaberMarkupLanguage 1.5.8+
+
+## Usage notes
+- Hologram mirror does not currently work on Duels (1v1 games)
+- This mod's features, when enabled, will override and ignore MultiplayerExtension's "Hologram" toggle
