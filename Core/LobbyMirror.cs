@@ -115,14 +115,17 @@ namespace MultiplayerMirror.Core
                 avatarController.gameObject.GetComponent<MultiplayerAvatarPoseController>();
             multiplayerAvatarPoseController.connectedPlayer = basePlayer;
 
-            var internalAvatarPoseController =
-                multiplayerAvatarPoseController.GetField<AvatarPoseController, MultiplayerAvatarPoseController>(
-                    "_avatarPoseController");
+            if (!(Plugin.Config?.InvertMirror ?? false))
+            {
+                // Enable actual mirror effect - this script mirrors position and rotation
+                var internalAvatarPoseController =
+                    multiplayerAvatarPoseController.GetField<AvatarPoseController, MultiplayerAvatarPoseController>(
+                        "_avatarPoseController");
+                
+                var avatarPoseMirror = avatarController.gameObject.AddComponent<AvatarPoseMirror>();
+                avatarPoseMirror.SetField("_avatarPoseController", internalAvatarPoseController);
+            }
 
-            // Enable actual mirror effect - this script mirrors position and rotation
-            var avatarPoseMirror = avatarController.gameObject.AddComponent<AvatarPoseMirror>();
-            avatarPoseMirror.SetField("_avatarPoseController", internalAvatarPoseController);
-            
             SyncConfigSetting();
         }
 

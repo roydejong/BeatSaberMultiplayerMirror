@@ -14,5 +14,9 @@
         /// If enabled, force self-hologram in multiplayer matches, never showing other player's avatars.
         /// </summary>
         public bool ForceSelfHologram = true;
+        /// <summary>
+        /// If true, do not apply mirror script, so your left and right are flipped from the mirror.
+        /// </summary>
+        public bool InvertMirror = false;
     }
 }

@@ -145,16 +145,20 @@ namespace MultiplayerMirror.Core
                 // Rotate big avatar so it faces the player
                 _tfSelfBigAvatar.Rotate(0f, 180f, 0f);
                 _tfSelfBigAvatar.position = new Vector3(0f, -1.5f, 50f);
-                
-                // Add mirror script to the pose controller
-                var multiplayerAvatarPoseController = _tfSelfBigAvatar.GetComponent<MultiplayerAvatarPoseController>();
-                
-                var internalAvatarPoseController =
-                    multiplayerAvatarPoseController.GetField<AvatarPoseController, MultiplayerAvatarPoseController>(
-                        "_avatarPoseController");
-                
-                var avatarPoseMirror = _tfSelfBigAvatar.gameObject.AddComponent<AvatarPoseMirror>();
-                avatarPoseMirror.SetField("_avatarPoseController", internalAvatarPoseController);
+
+                if (!(Plugin.Config?.InvertMirror ?? false))
+                {
+                    // Add mirror script to the pose controller
+                    var multiplayerAvatarPoseController =
+                        _tfSelfBigAvatar.GetComponent<MultiplayerAvatarPoseController>();
+
+                    var internalAvatarPoseController =
+                        multiplayerAvatarPoseController.GetField<AvatarPoseController, MultiplayerAvatarPoseController>(
+                            "_avatarPoseController");
+
+                    var avatarPoseMirror = _tfSelfBigAvatar.gameObject.AddComponent<AvatarPoseMirror>();
+                    avatarPoseMirror.SetField("_avatarPoseController", internalAvatarPoseController);
+                }
             }
 
             if (_bigAvatarAnimator is not null)

@@ -20,6 +20,11 @@ namespace MultiplayerMirror
         
         private LobbyMirror? _lobbyMirror;
         private HologramMirror? _hologramMirror;
+
+        public Plugin() : base()
+        {
+            Config = new PluginConfig();
+        }
         
         [Init]
         public void Init(IPALogger logger, IPA.Config.Config config)
