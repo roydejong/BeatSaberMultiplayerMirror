@@ -1,5 +1,6 @@
 ﻿using System;
 using IPA.Utilities;
+using MultiplayerMirror.Core.Scripts;
 using MultiplayerMirror.Events;
 using MultiplayerMirror.Events.Models;
 using UnityEngine;
@@ -14,6 +15,7 @@ namespace MultiplayerMirror.Core
         private IConnectedPlayer? _localPlayer;
         private MockPlayer? _mockPlayer;
         private MultiplayerLobbyAvatarController? _mockPlayerAvatarController;
+        private CustomAvatarPoseMirror? _mockAvatarMirrorScript;
 
         #region Setup
         public void SetUp()
@@ -75,6 +77,9 @@ namespace MultiplayerMirror.Core
             {
                 _mockPlayerAvatarController.gameObject.SetActive(false);
             }
+
+            if (_mockAvatarMirrorScript is not null)
+                _mockAvatarMirrorScript.enabled = !(Plugin.Config?.InvertMirror ?? false);
         }
         
         private MockPlayer CreateMockPlayer(IConnectedPlayer basePlayer)
@@ -83,7 +88,7 @@ namespace MultiplayerMirror.Core
             
             var mockPlayerSettings = new MockPlayerSettings()
             {
-                userId = basePlayer.userId,
+                userId = "MirrorUserId123",
                 userName = $"{basePlayer.userName}-Mirror",
                 sortIndex = basePlayer.sortIndex,
                 latency = 0.0f,
@@ -115,16 +120,13 @@ namespace MultiplayerMirror.Core
                 avatarController.gameObject.GetComponent<MultiplayerAvatarPoseController>();
             multiplayerAvatarPoseController.connectedPlayer = basePlayer;
 
-            if (!(Plugin.Config?.InvertMirror ?? false))
-            {
-                // Enable actual mirror effect - this script mirrors position and rotation
-                var internalAvatarPoseController =
-                    multiplayerAvatarPoseController.GetField<AvatarPoseController, MultiplayerAvatarPoseController>(
-                        "_avatarPoseController");
-                
-                var avatarPoseMirror = avatarController.gameObject.AddComponent<AvatarPoseMirror>();
-                avatarPoseMirror.SetField("_avatarPoseController", internalAvatarPoseController);
-            }
+            // Enable actual mirror effect - this script mirrors position and rotation
+            var internalAvatarPoseController =
+                multiplayerAvatarPoseController.GetField<AvatarPoseController, MultiplayerAvatarPoseController>(
+                    "_avatarPoseController");
+            
+            _mockAvatarMirrorScript = avatarController.gameObject.AddComponent<CustomAvatarPoseMirror>();
+            _mockAvatarMirrorScript.Init(internalAvatarPoseController);
 
             SyncConfigSetting();
         }

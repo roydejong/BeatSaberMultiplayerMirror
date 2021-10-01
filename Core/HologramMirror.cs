@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using IPA.Utilities;
+using MultiplayerMirror.Core.Scripts;
 using MultiplayerMirror.Events;
 using MultiplayerMirror.Events.Models;
 using Tweening;
@@ -146,19 +147,17 @@ namespace MultiplayerMirror.Core
                 _tfSelfBigAvatar.Rotate(0f, 180f, 0f);
                 _tfSelfBigAvatar.position = new Vector3(0f, -1.5f, 50f);
 
-                if (!(Plugin.Config?.InvertMirror ?? false))
-                {
-                    // Add mirror script to the pose controller
-                    var multiplayerAvatarPoseController =
-                        _tfSelfBigAvatar.GetComponent<MultiplayerAvatarPoseController>();
+                // Add mirror script to the pose controller
+                var multiplayerAvatarPoseController =
+                    _tfSelfBigAvatar.GetComponent<MultiplayerAvatarPoseController>();
 
-                    var internalAvatarPoseController =
-                        multiplayerAvatarPoseController.GetField<AvatarPoseController, MultiplayerAvatarPoseController>(
-                            "_avatarPoseController");
+                var internalAvatarPoseController =
+                    multiplayerAvatarPoseController.GetField<AvatarPoseController, MultiplayerAvatarPoseController>(
+                        "_avatarPoseController");
 
-                    var avatarPoseMirror = _tfSelfBigAvatar.gameObject.AddComponent<AvatarPoseMirror>();
-                    avatarPoseMirror.SetField("_avatarPoseController", internalAvatarPoseController);
-                }
+                var avatarPoseMirror = _tfSelfBigAvatar.gameObject.AddComponent<CustomAvatarPoseMirror>();
+                avatarPoseMirror.Init(internalAvatarPoseController);
+                avatarPoseMirror.enabled = !(Plugin.Config?.InvertMirror ?? false);
             }
 
             if (_bigAvatarAnimator is not null)

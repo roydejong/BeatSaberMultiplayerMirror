@@ -42,6 +42,18 @@ namespace MultiplayerMirror.UI
                 ModEvents.RaiseConfigChanged(this);
             }
         } 
+        
+        [UIValue("InvertMirror")]
+        public bool InvertMirror
+        {
+            get => Plugin.Config!.InvertMirror;
+            set
+            {
+                Plugin.Config!.InvertMirror = value;
+                NotifyPropertyChanged();
+                ModEvents.RaiseConfigChanged(this);
+            }
+        } 
         #endregion
 
         #region Actions
@@ -77,6 +89,12 @@ namespace MultiplayerMirror.UI
             {
                 ForceSelfHologram = false;   
             }
+        }
+
+        [UIAction("SetInvertMirror")]
+        public void SetInvertMirror(bool value)
+        {
+            InvertMirror = value;
         }
         #endregion
     }

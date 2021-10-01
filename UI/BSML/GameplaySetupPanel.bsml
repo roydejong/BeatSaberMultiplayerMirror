@@ -28,5 +28,16 @@
       hover-hint="Always show a mirror hologram of yourself during gameplay, no matter what place you're in."
     />
     
+    <horizontal pad-top="10"/>
+    
+    <toggle-setting
+      id="InvertMirror"
+      value="InvertMirror"
+      on-change="SetInvertMirror"
+      bind-value="true"
+      text="Invert mirror"
+      hover-hint="Invert the mirrored avatar, so left/right positions are flipped. Affects lobby and hologram."
+    />
+    
   </modifier-container>
 </bg>
