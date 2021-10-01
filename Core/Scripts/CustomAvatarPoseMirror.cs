@@ -45,8 +45,8 @@ namespace MultiplayerMirror.Core.Scripts
             out Vector3 newRightHandPosition)
         {
             newHeadPosition = MirrorPosition(headPosition);
-            newLeftHandPosition = MirrorPosition(leftHandPosition);
-            newRightHandPosition = MirrorPosition(rightHandPosition);
+            newLeftHandPosition = MirrorPosition(rightHandPosition);
+            newRightHandPosition = MirrorPosition(leftHandPosition);
         }
 
         private static void HandleAvatarPoseControllerRotationsWillBeSet(
@@ -58,11 +58,11 @@ namespace MultiplayerMirror.Core.Scripts
             out Quaternion newRightHandRotation)
         {
             newHeadRotation = MirrorRotation(headRotation);
-            newLeftHandRotation = MirrorRotation(leftHandRotation, true);
-            newRightHandRotation = MirrorRotation(rightHandRotation, true);
+            newLeftHandRotation = MirrorRotation(rightHandRotation);
+            newRightHandRotation = MirrorRotation(leftHandRotation);
         }
 
-        private static Quaternion MirrorRotation(Quaternion rotation, bool isHand = false)
+        private static Quaternion MirrorRotation(Quaternion rotation)
         {
             return new Quaternion(rotation.x, -rotation.y, -rotation.z, rotation.w);
         }
