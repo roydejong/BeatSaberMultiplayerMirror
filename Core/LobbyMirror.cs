@@ -1,5 +1,6 @@
 ﻿using System;
 using IPA.Utilities;
+using MultiplayerMirror.Core.Helpers;
 using MultiplayerMirror.Core.Scripts;
 using MultiplayerMirror.Events;
 using MultiplayerMirror.Events.Models;
@@ -16,6 +17,7 @@ namespace MultiplayerMirror.Core
         private MockPlayer? _mockPlayer;
         private MultiplayerLobbyAvatarController? _mockPlayerAvatarController;
         private CustomAvatarPoseMirror? _mockAvatarMirrorScript;
+        private GameObject? _goPlayerAvatar;
 
         #region Setup
         public void SetUp()
@@ -78,8 +80,13 @@ namespace MultiplayerMirror.Core
                 _mockPlayerAvatarController.gameObject.SetActive(false);
             }
 
+            var enableMirror = !(Plugin.Config?.InvertMirror ?? false);
+
             if (_mockAvatarMirrorScript is not null)
-                _mockAvatarMirrorScript.enabled = !(Plugin.Config?.InvertMirror ?? false);
+                _mockAvatarMirrorScript.enabled = enableMirror;
+            
+            if (_goPlayerAvatar is not null)
+                HandSwapper.ApplySwap(_goPlayerAvatar, enableMirror);
         }
         
         private MockPlayer CreateMockPlayer(IConnectedPlayer basePlayer)
@@ -124,6 +131,8 @@ namespace MultiplayerMirror.Core
             var internalAvatarPoseController =
                 multiplayerAvatarPoseController.GetField<AvatarPoseController, MultiplayerAvatarPoseController>(
                     "_avatarPoseController");
+            
+            _goPlayerAvatar = internalAvatarPoseController.gameObject;
             
             _mockAvatarMirrorScript = avatarController.gameObject.AddComponent<CustomAvatarPoseMirror>();
             _mockAvatarMirrorScript.Init(internalAvatarPoseController);

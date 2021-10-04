@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using IPA.Utilities;
+using MultiplayerMirror.Core.Helpers;
 using MultiplayerMirror.Core.Scripts;
 using MultiplayerMirror.Events;
 using MultiplayerMirror.Events.Models;
@@ -155,9 +156,13 @@ namespace MultiplayerMirror.Core
                     multiplayerAvatarPoseController.GetField<AvatarPoseController, MultiplayerAvatarPoseController>(
                         "_avatarPoseController");
 
+                var enableMirror = !(Plugin.Config?.InvertMirror ?? false);
+                
                 var avatarPoseMirror = _tfSelfBigAvatar.gameObject.AddComponent<CustomAvatarPoseMirror>();
                 avatarPoseMirror.Init(internalAvatarPoseController);
-                avatarPoseMirror.enabled = !(Plugin.Config?.InvertMirror ?? false);
+                avatarPoseMirror.enabled = enableMirror;
+                
+                HandSwapper.ApplySwap(internalAvatarPoseController.gameObject, enableMirror);
             }
 
             if (_bigAvatarAnimator is not null)
