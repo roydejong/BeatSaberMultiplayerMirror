@@ -6,7 +6,7 @@ Have you ever wondered if you look as cool in multiplayer as you think you do? D
 ![Multiplayer Mirror](https://user-images.githubusercontent.com/6772638/136465227-bb4b0d5e-b1e0-49ca-8317-b2a24d4d524e.png)
 
 ## Features
-Multiplayer Mirror adds options for mirroring your own avatar while in multiplayer. Supports Beat Saber 1.18.0 and 1.18.1.
+Multiplayer Mirror adds options for mirroring your own avatar while in multiplayer. 
  
 These effects are only visible to you. They work on any multiplayer server and lobby type.
 
