@@ -2,8 +2,8 @@
 {
     public class FirstPlayerDidChangeEventArgs
     {
-        public MultiplayerLeadPlayerProvider LeadPlayerProvider;
-        public MultiplayerScoreProvider.RankedPlayer? FirstPlayer;
+        public readonly MultiplayerLeadPlayerProvider LeadPlayerProvider;
+        public readonly MultiplayerScoreProvider.RankedPlayer? FirstPlayer;
 
         public FirstPlayerDidChangeEventArgs(MultiplayerLeadPlayerProvider leadPlayerProvider,
             MultiplayerScoreProvider.RankedPlayer? firstPlayer)

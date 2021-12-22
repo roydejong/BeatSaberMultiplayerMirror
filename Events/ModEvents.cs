@@ -46,6 +46,16 @@ namespace MultiplayerMirror.Events
             FirstPlayerDidChange.RaiseEventSafe(sender, e);
         #endregion
         
+        #region NewLeaderWasSelected
+        /// <summary>
+        /// This event is raised when the player in 1st position is about to be animated (hologram activation).
+        /// </summary>
+        internal static event EventHandler<NewLeaderWasSelectedEventArgs>? NewLeaderWasSelected;
+
+        internal static void RaiseNewLeaderWasSelected(object sender, NewLeaderWasSelectedEventArgs e) =>
+            NewLeaderWasSelected.RaiseEventSafe(sender, e);
+        #endregion
+        
         #region Helper code
         private static void RaiseEventSafe<TArgs>(this EventHandler<TArgs>? e, object sender, TArgs args)
         {

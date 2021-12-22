@@ -22,12 +22,14 @@ namespace MultiplayerMirror.Core
         {
             ModEvents.PlayersSpawned += OnPlayersSpawned;
             ModEvents.FirstPlayerDidChange += OnFirstPlayerDidChange;
+            ModEvents.NewLeaderWasSelected += OnNewLeaderWasSelected;
         }
 
         public void TearDown()
         {
             ModEvents.PlayersSpawned -= OnPlayersSpawned;
             ModEvents.FirstPlayerDidChange -= OnFirstPlayerDidChange;
+            ModEvents.NewLeaderWasSelected -= OnNewLeaderWasSelected;
         }
         #endregion
 
@@ -88,24 +90,27 @@ namespace MultiplayerMirror.Core
                 }
             }
 
-            var weAreLeading = e.FirstPlayer is not null && e.FirstPlayer.userId == _localPlayer.userId;
-
             if (Plugin.Config.ForceSelfHologram && _rankedLocalPlayer is not null && e.FirstPlayer != _rankedLocalPlayer)
             {
                 // Force mode: set local player to always be in 1st place, even when they're not
                 e.LeadPlayerProvider.HandleFirstPlayerDidChange(_rankedLocalPlayer);
-                weAreLeading = true;
             }
+        }
+        
+        private void OnNewLeaderWasSelected(object sender, NewLeaderWasSelectedEventArgs e)
+        {
+            // The hologram for the leader is about to be activated
+            // We are responsible for our own hologram activation/deactivation
             
-            // Toggle self hologram if we are leading currently (forced or otherwise)
-            if (_tfSelfBigAvatar is not null)
-                _tfSelfBigAvatar.gameObject.SetActive(true);
+            if (_tfSelfBigAvatar is null || _bigAvatarAnimator is null || _localPlayer is null)
+                return;
             
-            if (_bigAvatarAnimator is not null)
-                if (weAreLeading)
-                    _bigAvatarAnimator.Animate(true, 0.3f, EaseType.OutBack);
-                else
-                    _bigAvatarAnimator.Animate(false, 0.15f, EaseType.OutQuad);
+            _tfSelfBigAvatar.gameObject.SetActive(true);
+            
+            if (e.UserId == _localPlayer.userId)
+                _bigAvatarAnimator.Animate(true, 0.3f, EaseType.OutBack);
+            else
+                _bigAvatarAnimator.Animate(false, 0.15f, EaseType.OutQuad);
         }
         #endregion
 
@@ -171,6 +176,7 @@ namespace MultiplayerMirror.Core
                 
                 if (Plugin.Config?.ForceSelfHologram ?? false)
                 {
+                    // Force mode: show immediately
                     _bigAvatarAnimator.name = "MultiplayerMirrorHologramAnimator";
                     _bigAvatarAnimator.Animate(true, 1f, EaseType.OutBack);
                 }

@@ -5,9 +5,9 @@ namespace MultiplayerMirror.Events.Models
 {
     public class PlayersSpawnedEventArgs
     {
-        public MultiplayerPlayersManager PlayersManager;
-        public MultiplayerPlayerStartState LocalStartState;
-        public IEnumerable<IConnectedPlayer> ActivePlayers;
+        public readonly MultiplayerPlayersManager PlayersManager;
+        public readonly MultiplayerPlayerStartState LocalStartState;
+        public readonly IEnumerable<IConnectedPlayer> ActivePlayers;
 
         public PlayersSpawnedEventArgs(MultiplayerPlayersManager playersManager,
             MultiplayerPlayerStartState localStartState, IEnumerable<IConnectedPlayer> activePlayers)
