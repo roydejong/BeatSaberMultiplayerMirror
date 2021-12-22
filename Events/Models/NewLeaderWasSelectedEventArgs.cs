@@ -1,18 +1,19 @@
-﻿namespace MultiplayerMirror.Events.Models;
-
-public class NewLeaderWasSelectedEventArgs
+﻿namespace MultiplayerMirror.Events.Models
 {
-    public readonly MultiplayerGameplayAnimator MultiplayerGameplayAnimator;
-    public readonly string UserId;
-
-    public NewLeaderWasSelectedEventArgs(MultiplayerGameplayAnimator multiplayerGameplayAnimator, string userId)
+    public class NewLeaderWasSelectedEventArgs
     {
-        MultiplayerGameplayAnimator = multiplayerGameplayAnimator;
-        UserId = userId;
-    }
+        public readonly MultiplayerGameplayAnimator MultiplayerGameplayAnimator;
+        public readonly string UserId;
 
-    public override string ToString()
-    {
-        return $"NewLeaderWasSelectedEventArgs (UserId={UserId})";
+        public NewLeaderWasSelectedEventArgs(MultiplayerGameplayAnimator multiplayerGameplayAnimator, string userId)
+        {
+            MultiplayerGameplayAnimator = multiplayerGameplayAnimator;
+            UserId = userId;
+        }
+
+        public override string ToString()
+        {
+            return $"NewLeaderWasSelectedEventArgs (UserId={UserId})";
+        }
     }
 }
