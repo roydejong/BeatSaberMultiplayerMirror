@@ -4,7 +4,10 @@
   "name": "MultiplayerMirror",
   "author": "LookAtHippo",
   "version": "0.1.2",
-  "description": "Adds mirror options for your multiplayer avatar.",
+  "description": [
+    "#![MultiplayerMirror.description.md]",
+    "Adds mirror options for your multiplayer avatar."
+  ],
   "gameVersion": "1.19.0",
   "dependsOn": {
     "BSIPA": "^4.2.0",

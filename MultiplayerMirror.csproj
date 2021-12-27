@@ -62,6 +62,8 @@
       <EmbeddedResource Include="UI\BSML\GameplaySetupPanel.bsml" />
       <None Remove="Assets\icon.png" />
       <EmbeddedResource Include="Assets\icon.png" />
+      <None Remove="description.md" />
+      <EmbeddedResource Include="description.md" />
     </ItemGroup>
 
 </Project>
