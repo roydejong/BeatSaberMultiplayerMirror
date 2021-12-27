@@ -10,6 +10,7 @@
     "BSIPA": "^4.2.0",
     "BeatSaberMarkupLanguage": "^1.5.8"
   },
+  "icon": "MultiplayerMirror.Assets.icon.png",
   "links": {
     "project-home": "https://github.com/roydejong/BeatSaberMultiplayerMirror",
     "project-source": "https://github.com/roydejong/BeatSaberMultiplayerMirror"
