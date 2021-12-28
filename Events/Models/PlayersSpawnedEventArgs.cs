@@ -8,6 +8,8 @@ namespace MultiplayerMirror.Events.Models
         public readonly MultiplayerPlayersManager PlayersManager;
         public readonly MultiplayerPlayerStartState LocalStartState;
         public readonly IEnumerable<IConnectedPlayer> ActivePlayers;
+        
+        public bool IsDuel => ActivePlayers.Count() == 2;
 
         public PlayersSpawnedEventArgs(MultiplayerPlayersManager playersManager,
             MultiplayerPlayerStartState localStartState, IEnumerable<IConnectedPlayer> activePlayers)

@@ -50,6 +50,10 @@ namespace MultiplayerMirror.Core
             if (e.LocalStartState == MultiplayerPlayerStartState.Late)
                 // We connected late, don't do anything
                 return;
+
+            if (e.IsDuel)
+                // Duel is not currently supported, don't do anything
+                return;
             
             foreach (var player in e.ActivePlayers)
                 if (player.isMe)
