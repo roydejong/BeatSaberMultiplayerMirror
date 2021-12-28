@@ -13,4 +13,7 @@ Global
 		{8B5367B8-0145-4771-A4FE-CA7B9FF25D0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8B5367B8-0145-4771-A4FE-CA7B9FF25D0C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(RiderSharedRunConfigurations) = postSolution
+		File = BeatSaberDebug.run\Beat Saber Debug.run.xml
+	EndGlobalSection
 EndGlobal
