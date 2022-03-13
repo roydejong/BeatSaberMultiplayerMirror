@@ -31,7 +31,7 @@ Download the mod, and place `MultiplayerMirror.dll` in your Beat Saber `Plugins`
 You can download the [**✅ Latest Stable Release**](https://github.com/roydejong/BeatSaberMultiplayerMirror/releases/latest) or a [**☠ Development Build**](https://github.com/roydejong/BeatSaberMultiplayerMirror/actions/workflows/dotnet.yml?query=is%3Asuccess+branch%3Amain) from GitHub.
 
 ### Requirements
-- Beat Saber 1.18, 1.19, or compatible
+- Beat Saber 1.18, 1.19, 1.20, or compatible
 - Mods installed with [Mod Assistant](https://github.com/Assistant/ModAssistant):
   - BSIPA 4.2.0+
   - BeatSaberMarkupLanguage 1.5.8+
