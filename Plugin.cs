@@ -3,23 +3,25 @@ using BeatSaberMarkupLanguage.GameplaySetup;
 using IPA;
 using IPA.Config.Stores;
 using MultiplayerMirror.Core;
+using MultiplayerMirror.Core.Installers;
 using MultiplayerMirror.UI;
+using SiraUtil.Web.SiraSync;
+using SiraUtil.Zenject;
 using IPALogger = IPA.Logging.Logger;
 
 namespace MultiplayerMirror
 {
     [Plugin(RuntimeOptions.DynamicInit)]
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class Plugin
     {
-        public const string HarmonyId = "mod.multiplayermirror";
+        public const string HarmonyId = "com.hippomade.multiplayermirror";
+        
+        internal static PluginConfig Config { get; private set; } = null!;
 
         internal static IPALogger? Log { get; private set; }
-        internal static PluginConfig? Config { get; private set; }
 
         private HarmonyLib.Harmony? _harmony;
-        
-        private LobbyMirror? _lobbyMirror;
-        private HologramMirror? _hologramMirror;
 
         public Plugin() : base()
         {
@@ -27,15 +29,19 @@ namespace MultiplayerMirror
         }
         
         [Init]
-        public void Init(IPALogger logger, IPA.Config.Config config)
+        public void Init(IPALogger logger, Zenjector zenjector, IPA.Config.Config config)
         {
             Log = logger;
+            _harmony = new HarmonyLib.Harmony(HarmonyId);
             Config = config.Generated<PluginConfig>();
 
-            _harmony = new HarmonyLib.Harmony(HarmonyId);
+            zenjector.UseMetadataBinder<Plugin>();
+            zenjector.UseLogger(logger);
+            zenjector.UseSiraSync(SiraSyncServiceType.GitHub, "roydejong", "BeatSaberMultiplayerMirror");
             
-            _lobbyMirror = new LobbyMirror();
-            _hologramMirror = new HologramMirror();
+            zenjector.Install<MpMirrorAppInstaller>(Location.App);
+            zenjector.Install<MpMirrorMenuInstaller>(Location.Menu);
+            zenjector.Install<MpMirrorMultiPlayerInstaller>(Location.MultiPlayer);
         }
         
         [OnEnable]
@@ -44,10 +50,6 @@ namespace MultiplayerMirror
             // Install Harmony patches
             _harmony?.PatchAll(Assembly.GetExecutingAssembly());
 
-            // Setup core components
-            _hologramMirror?.SetUp();
-            _lobbyMirror?.SetUp();
-            
             // Add gameplay setup tab
             GameplaySetup.instance.AddTab(
                 name: "Multiplayer Mirror", 
@@ -62,10 +64,6 @@ namespace MultiplayerMirror
         {
             // Remove gameplay setup tab
             GameplaySetup.instance.RemoveTab("Multiplayer Mirror");
-            
-            // Shut down core components
-            _hologramMirror?.TearDown();
-            _lobbyMirror?.TearDown();
             
             // Remove Harmony patches
             _harmony?.UnpatchSelf();
