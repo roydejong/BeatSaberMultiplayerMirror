@@ -1,5 +1,5 @@
-<bg child-expand-width="true" min-width="100">
-  <modifier-container child-expand-width="true" min-width="100">    
+<bg child-expand-width="true" min-width="110">
+  <modifier-container child-expand-width="true" min-width="110">    
   
     <toggle-setting
       id="EnableLobbyMirror"
@@ -9,6 +9,8 @@
       text="Enable Lobby Mirror"
       hover-hint="Show a mirror avatar of yourself in the lobby."
     />
+
+    <horizontal pad-top="5"/>
     
     <toggle-setting
       id="EnableSelfHologram"
@@ -18,17 +20,16 @@
       text="Enable Self Hologram"
       hover-hint="When you're in 1st place, show a mirror hologram of yourself."
     />
-    
     <toggle-setting
       id="ForceSelfHologram"
       value="ForceSelfHologram"
       on-change="SetForceSelfHologram"
       bind-value="true"
-      text="Force show Self Hologram"
+      text="Always show Self Hologram"
       hover-hint="Always show a mirror hologram of yourself during gameplay, no matter what place you're in."
     />
     
-    <horizontal pad-top="10"/>
+    <horizontal pad-top="5"/>
     
     <toggle-setting
       id="InvertMirror"

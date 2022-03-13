@@ -41,7 +41,7 @@ namespace MultiplayerMirror
             
             zenjector.Install<MpMirrorAppInstaller>(Location.App);
             zenjector.Install<MpMirrorMenuInstaller>(Location.Menu);
-            zenjector.Install<MpMirrorMultiPlayerInstaller>(Location.MultiPlayer);
+            zenjector.Install<MpMirrorMultiPlayerInstaller>(Location.MultiplayerCore);
         }
         
         [OnEnable]

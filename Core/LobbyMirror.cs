@@ -15,9 +15,9 @@ namespace MultiplayerMirror.Core
         private static readonly Vector3 MirrorSpawnPos = new(0.0f, 0.0f, 3.0f);
         private static readonly Quaternion MirrorSpawnRot = new(0f, 180f, 0f, 0f);
 
-        [Inject] private SiraLog _log = null!;
-        [Inject] private PluginConfig _config = null!;
-        [Inject] private MultiplayerLobbyAvatarManager _lobbyAvatarManager = null!;
+        [Inject] private readonly SiraLog _log = null!;
+        [Inject] private readonly PluginConfig _config = null!;
+        [Inject] private readonly MultiplayerLobbyAvatarManager _lobbyAvatarManager = null!;
 
         private IConnectedPlayer? _selfPlayer;
         private IConnectedPlayer? _mockPlayer;
