@@ -1,41 +1,48 @@
 # Multiplayer Mirror
-🙋‍♂️ **Beat Saber mod that adds mirror options for your multiplayer avatar.**
 
-Have you ever wondered if you look as cool in multiplayer as you think you do? Do you love looking at yourself in the mirror? Have you ever wanted to kiss your own avatar? This mod is here for you. 
+🙋‍ **Beat Saber mod that adds mirror options for your multiplayer avatar.**
+
+Have you ever wondered if you look as cool in multiplayer as you think you do? Do you love looking at yourself in the
+mirror? Have you ever wanted to kiss your own avatar? This mod is here for you.
 
 ![Multiplayer Mirror](https://user-images.githubusercontent.com/6772638/136465227-bb4b0d5e-b1e0-49ca-8317-b2a24d4d524e.png)
 
 ## Features
-Multiplayer Mirror adds options for mirroring your own avatar while in multiplayer. 
- 
+
+Multiplayer Mirror adds options for seeing your own multiplayer avatar.
+
 These effects are only visible to you. They work on any multiplayer server and lobby type.
 
- 👉 You can toggle these options in the mod's gameplay modifiers panel (on the left in the lobby, under *Mods* → *Multiplayer Mirror*).
+👉 You can toggle these options in the mod's gameplay modifiers panel (on the left in the lobby, under *Mods* → *Multiplayer Mirror*).
 
-#### Toggle Lobby Mirror
-Show a mirror avatar of yourself in the lobby.
+### Settings
 
-#### Enable Self Hologram
-When you're in 1st place during gameplay, show a mirror hologram of yourself.
-
-#### Force show Self Hologram
-Always show a mirror hologram of yourself during gameplay, no matter what place you're in.
-
-#### Invert mirror
-If enabled, flip left/right positions, like on the results screen. Affects both the lobby and hologram mirrors. 
+| Setting                       | Description                                                                                                                         |
+|-------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| **Enable Lobby Mirror**       | If enabled, you'll see an avatar mirror of yourself in the multiplayer lobby.                                                       |
+| **Enable Self Hologram**      | If enabled, you'll see a hologram of yourself in multiplayer games whenever you're in 1st place, just like other players would see. |
+| **Always show Self Hologram** | If enabled, you'll always see your own hologram in game, no matter what place you're in.                                            |
+| **Show Duel Self Hologram**   | If enabled, the Self Hologram will be shown in the Duel (1v1) layout as well.                                                       |
+| **Invert mirror**             | If enabled, your lobby and game mirrors will be inverted, like you are normally on the results screen.                              |                                                                                        
 
 ## Installation
+
 Download the mod, and place `MultiplayerMirror.dll` in your Beat Saber `Plugins` folder.
 
 ### Download
-You can download the [**✅ Latest Stable Release**](https://github.com/roydejong/BeatSaberMultiplayerMirror/releases/latest) or a [**☠ Development Build**](https://github.com/roydejong/BeatSaberMultiplayerMirror/actions/workflows/dotnet.yml?query=is%3Asuccess+branch%3Amain) from GitHub.
+
+You can download the [**✅ Latest Stable
+Release**](https://github.com/roydejong/BeatSaberMultiplayerMirror/releases/latest) from GitHub.
 
 ### Requirements
-- Beat Saber 1.18, 1.19, or compatible
+
+- Beat Saber 1.20 or compatible
 - Mods installed with [Mod Assistant](https://github.com/Assistant/ModAssistant):
-  - BSIPA 4.2.0+
-  - BeatSaberMarkupLanguage 1.5.8+
+    - BSIPA 4.2.1+
+    - BeatSaberMarkupLanguage 1.6.1+
+    - SiraUtil 3.0.4+
 
 ## Usage notes
-- Hologram mirror does not currently work on Duels (1v1 games)
-- This mod's features, when enabled, will override and ignore MultiplayerExtension's "Hologram" toggle
+
+### MultiplayerExtensions
+If you turn off Holograms in MultiplayerExtensions, that setting will be ignored if you enable a self hologram in this mod.
