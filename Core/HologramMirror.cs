@@ -1,191 +1,230 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using IPA.Utilities;
 using MultiplayerMirror.Core.Helpers;
 using MultiplayerMirror.Core.Scripts;
-using MultiplayerMirror.Events;
-using MultiplayerMirror.Events.Models;
-using Tweening;
+using SiraUtil.Affinity;
+using SiraUtil.Logging;
 using UnityEngine;
+using Zenject;
+using Object = System.Object;
 
 namespace MultiplayerMirror.Core
 {
-    public class HologramMirror
+    public class HologramMirror : IInitializable, IDisposable, IAffinity
     {
-        private IConnectedPlayer? _localPlayer;
-        private MultiplayerScoreProvider.RankedPlayer? _rankedLocalPlayer;
-        private MultiplayerConnectedPlayerFacade? _mirrorFacade;
-        private Transform? _tfSelfBigAvatar;
-        private MultiplayerBigAvatarAnimator? _bigAvatarAnimator;
+        private const string MirroredAnimatorName = "MultiplayerMirrorHologramAnimator";
+        private static readonly Vector3 MirrorPositionCircle = new(0f, -1.5f, 50f);
+        private static readonly Vector3 MirrorPositionDuel = new(0f, -1.5f, 60f);
 
-        #region Setup
-        public void SetUp()
+        [Inject] private readonly SiraLog _log = null!;
+        [Inject] private readonly PluginConfig _config = null!;
+        [Inject] private readonly DiContainer _container = null!;
+        [Inject] private readonly MultiplayerPlayersManager _playersManager = null!;
+        [Inject] private readonly MultiplayerLeadPlayerProvider _leadPlayerProvider = null!;
+
+        private MultiplayerConnectedPlayerFacade _connectedPlayerPrefab = null!;
+        private IConnectedPlayer? _selfPlayer = null;
+        private GameObject? _mirrorPlayerGO = null;
+        private GameObject? _mirrorBigAvatarGO = null;
+        private MultiplayerBigAvatarAnimator? _mirrorBigAvatarAnimator = null;
+        private MultiplayerPlayerLayout _layout = MultiplayerPlayerLayout.NotDetermined;
+
+        public void Initialize()
         {
-            ModEvents.PlayersSpawned += OnPlayersSpawned;
-            ModEvents.FirstPlayerDidChange += OnFirstPlayerDidChange;
-            ModEvents.NewLeaderWasSelected += OnNewLeaderWasSelected;
+            _connectedPlayerPrefab =
+                _playersManager.GetField<MultiplayerConnectedPlayerFacade, MultiplayerPlayersManager>(
+                    "_connectedPlayerControllerPrefab");
+
+            _playersManager.playerSpawningDidFinishEvent += HandlePlayersSpawned;
+            _leadPlayerProvider.newLeaderWasSelectedEvent += HandleNewPlayerInLead;
         }
 
-        public void TearDown()
+        public void Dispose()
         {
-            ModEvents.PlayersSpawned -= OnPlayersSpawned;
-            ModEvents.FirstPlayerDidChange -= OnFirstPlayerDidChange;
-            ModEvents.NewLeaderWasSelected -= OnNewLeaderWasSelected;
+            _playersManager.playerSpawningDidFinishEvent -= HandlePlayersSpawned;
+            _leadPlayerProvider.newLeaderWasSelectedEvent -= HandleNewPlayerInLead;
+
+            DestroyMirrorPlayerIfActive();
         }
-        #endregion
 
         #region Events
-        private void OnPlayersSpawned(object sender, PlayersSpawnedEventArgs e)
+
+        private void HandlePlayersSpawned()
         {
-            // All players just spawned in gameplay, grab a reference to the local player
-            _localPlayer = null;
-            _rankedLocalPlayer = null;
-            _mirrorFacade = null;
-            _tfSelfBigAvatar = null;
-            _bigAvatarAnimator = null;
-
-            if (!(Plugin.Config?.EnableSelfHologram ?? false))
-                // Self-hologram option is not enabled, don't do anything
-                return;
-            
-            if (e.LocalStartState == MultiplayerPlayerStartState.Late)
-                // We connected late, don't do anything
+            if (!_config.EnableSelfHologram || (_layout == MultiplayerPlayerLayout.Duel && !_config.EnableDuelHologram))
+                // Self-hologram option is not enabled
                 return;
 
-            if (e.IsDuel)
-                // Duel is not currently supported, don't do anything
+            _selfPlayer = _playersManager.allActiveAtGameStartPlayers.FirstOrDefault(p => p.isMe);
+
+            if (_selfPlayer is null)
+                // Local player not found / was not active at game start
                 return;
-            
-            foreach (var player in e.ActivePlayers)
-                if (player.isMe)
-                    _localPlayer = player;
-            
-            if (_localPlayer is null)
-                // Local player is not active
-                return;
-            
-            // Create a facade for ourselves - which is normally used to represent remote players
-            // This effectively renders us in our own place with big avatar support
-            CreatePlayerMirrorFacade(e.PlayersManager, _localPlayer);
+
+            InstantiateMirrorPlayer();
         }
 
-        private void OnFirstPlayerDidChange(object sender, FirstPlayerDidChangeEventArgs e)
-        {
-            // A player has moved to 1st place, and the hologram is about to change
-            
-            if (!(Plugin.Config?.EnableSelfHologram ?? false))
-                // Self-hologram option is not enabled, we don't need to do anything
-                return;
-
-            if (_localPlayer == null)
-                // Players haven't spawned yet, or local player was not active at start
-                return;
-
-            // Get reference to "ranked" local player if we don't have it yet
-            if (_rankedLocalPlayer is null)
-            {
-                var scoreProvider =
-                    e.LeadPlayerProvider.GetField<MultiplayerScoreProvider, MultiplayerLeadPlayerProvider>(
-                        "_scoreProvider");
-
-                if (scoreProvider is not null)
-                {
-                    _rankedLocalPlayer =
-                        scoreProvider.rankedPlayers.FirstOrDefault(p => p.userId == _localPlayer.userId);
-                }
-            }
-
-            if (Plugin.Config.ForceSelfHologram && _rankedLocalPlayer is not null && e.FirstPlayer != _rankedLocalPlayer)
-            {
-                // Force mode: set local player to always be in 1st place, even when they're not
-                e.LeadPlayerProvider.HandleFirstPlayerDidChange(_rankedLocalPlayer);
-            }
-        }
-        
-        private void OnNewLeaderWasSelected(object sender, NewLeaderWasSelectedEventArgs e)
+        private void HandleNewPlayerInLead(string newLeadingUserId)
         {
             // The hologram for the leader is about to be activated
             // We are responsible for our own hologram activation/deactivation
-            
-            if (_tfSelfBigAvatar is null || _bigAvatarAnimator is null || _localPlayer is null)
+
+            if (_selfPlayer == null || _mirrorBigAvatarGO == null || _mirrorBigAvatarAnimator == null)
+                // Player or mirror avatar not spawned, no-op
                 return;
-            
-            _tfSelfBigAvatar.gameObject.SetActive(true);
-            
-            if (e.UserId == _localPlayer.userId)
-                _bigAvatarAnimator.Animate(true, 0.3f, EaseType.OutBack);
+
+            if (_config.ForceSelfHologram)
+                // Force mode enabled, we are always visible, do not animate
+                return;
+
+            if (newLeadingUserId == _selfPlayer.userId)
+            {
+                // We are the new lead, animate big avatar in
+                _mirrorBigAvatarAnimator.Animate(true, 0.3f, EaseType.OutBack);
+            }
             else
-                _bigAvatarAnimator.Animate(false, 0.15f, EaseType.OutQuad);
+            {
+                // We are NOT leading (anymore)
+                _mirrorBigAvatarAnimator.Animate(false, 0.15f, EaseType.OutQuad);
+            }
+        }
+
+        #endregion
+
+        #region Patches
+
+        [AffinityPostfix]
+        [AffinityPatch(typeof(MultiplayerBigAvatarAnimator), nameof(MultiplayerBigAvatarAnimator.InitIfNeeded))]
+        [AffinityAfter("com.github.Goobwabber.MultiplayerExtensions")]
+        private void PostfixBigAvatarInit(MultiplayerBigAvatarAnimator __instance)
+        {
+            // MultiplayerExtensions will set the game object to inactive if Holograms are toggled off
+
+            // If this is our animator, identified by name, re-enable immediately to work around this
+            // Rationale: an enabled feature here should take priority over "regular" holograms being disabled in MpEx 
+
+            if (__instance.name == MirroredAnimatorName)
+            {
+                __instance.gameObject.SetActive(true);
+            }
+        }
+
+        [AffinityPrefix]
+        [AffinityPatch(typeof(MultiplayerBigAvatarAnimator), nameof(MultiplayerBigAvatarAnimator.Animate))]
+        private bool PrefixBigAvatarAnimate(MultiplayerBigAvatarAnimator __instance)
+        {
+            if (!_config.EnableSelfHologram || !_config.ForceSelfHologram)
+                // Not enabled or not in forced mode, let code run as normal
+                return true;
+
+            if (__instance.gameObject.name == MirroredAnimatorName)
+                // This is our own animator, do not interfere (managed in HandleNewPlayerInLead)
+                return true;
+
+            // Force hide and disable animations for other player's big avatars while in forced mode
+            __instance.HideInstant();
+            return false;
+        }
+
+
+        [AffinityPostfix]
+        [AffinityPatch(typeof(MultiplayerPlayersManager), nameof(MultiplayerPlayersManager.BindPlayerFactories))]
+        private void HandleBindPlayerFactories(MultiplayerPlayerLayout layout)
+        {
+            _log.Info($"Multiplayer layout was determined (MultiplayerPlayerLayout={layout})");
+            _layout = layout;
         }
         #endregion
 
-        #region Mirror
-        private void CreatePlayerMirrorFacade(MultiplayerPlayersManager playersManager, IConnectedPlayer localPlayer)
-        {
-            var connectedPlayerFactory =
-                playersManager.GetField<MultiplayerConnectedPlayerFacade.Factory, MultiplayerPlayersManager>(
-                    "_connectedPlayerFactory");
+        #region Mirror facade
 
-            if (connectedPlayerFactory is null)
+        private void InstantiateMirrorPlayer()
+        {
+            if (_selfPlayer is null)
                 return;
-            
-            // Create a "remote player" facade for the local player 
-            _mirrorFacade = connectedPlayerFactory.Create(_localPlayer, MultiplayerPlayerStartState.InSync);
-            Plugin.Log?.Debug($"[HologramMirror] Created mirror facade for local player");
-            
+
+            DestroyMirrorPlayerIfActive();
+
+            // Create a "connected player" prefab based on our local player instance
+            // This will appear in our place and will effectively render us as a remote player on top of ourselves
+            var subContainer = _container.CreateSubContainer();
+            subContainer.BindInterfacesAndSelfTo<IConnectedPlayer>().FromInstance(_selfPlayer);
+            subContainer.BindInterfacesAndSelfTo<MultiplayerPlayerStartState>()
+                .FromInstance(MultiplayerPlayerStartState.InSync);
+            _mirrorPlayerGO = subContainer.InstantiatePrefab(_connectedPlayerPrefab);
+
             // Get reference to the big avatar; disable every other object
-            _tfSelfBigAvatar = null;
-            
-            foreach (Transform t in _mirrorFacade.transform)
+            _mirrorBigAvatarGO = null;
+            _mirrorBigAvatarAnimator = null;
+
+            foreach (Transform t in _mirrorPlayerGO.transform)
             {
-                if (t.name == "MultiplayerGameBigAvatar")
+                var go = t.gameObject;
+
+                if (go.name == "MultiplayerGameBigAvatar")
                 {
-                    _tfSelfBigAvatar = t;
-                    t.gameObject.SetActive(true);
+                    _mirrorBigAvatarGO = go;
+                    go.SetActive(true);
                     continue;
                 }
 
-                t.gameObject.SetActive(false);
-            }
-            
-            _bigAvatarAnimator = null;
-
-            if (_tfSelfBigAvatar is not null)
-            {
-                _bigAvatarAnimator = _tfSelfBigAvatar.GetComponent<MultiplayerBigAvatarAnimator>();
-                
-                // Rotate big avatar so it faces the player
-                _tfSelfBigAvatar.Rotate(0f, 180f, 0f);
-                _tfSelfBigAvatar.position = new Vector3(0f, -1.5f, 50f);
-
-                // Add mirror script to the pose controller
-                var multiplayerAvatarPoseController =
-                    _tfSelfBigAvatar.GetComponent<MultiplayerAvatarPoseController>();
-
-                var internalAvatarPoseController =
-                    multiplayerAvatarPoseController.GetField<AvatarPoseController, MultiplayerAvatarPoseController>(
-                        "_avatarPoseController");
-
-                var enableMirror = !(Plugin.Config?.InvertMirror ?? false);
-                
-                var avatarPoseMirror = _tfSelfBigAvatar.gameObject.AddComponent<CustomAvatarPoseMirror>();
-                avatarPoseMirror.Init(internalAvatarPoseController);
-                avatarPoseMirror.enabled = enableMirror;
-                
-                HandSwapper.ApplySwap(internalAvatarPoseController.gameObject, enableMirror);
+                go.SetActive(false);
             }
 
-            if (_bigAvatarAnimator is not null)
-            {
-                _bigAvatarAnimator.HideInstant();
-                
-                if (Plugin.Config?.ForceSelfHologram ?? false)
-                {
-                    // Force mode: show immediately
-                    _bigAvatarAnimator.name = "MultiplayerMirrorHologramAnimator";
-                    _bigAvatarAnimator.Animate(true, 1f, EaseType.OutBack);
-                }
-            }
+            if (_mirrorBigAvatarGO == null)
+                return;
+
+            ConfigureBigAvatar();
         }
+
+        private void ConfigureBigAvatar()
+        {
+            if (_mirrorBigAvatarGO == null)
+                return;
+
+            // Rotate big avatar so it faces the player
+            var baseTransform = _mirrorBigAvatarGO.transform;
+            baseTransform.Rotate(0f, 180f, 0f);
+            if (_layout == MultiplayerPlayerLayout.Duel)
+                baseTransform.position = MirrorPositionDuel;
+            else
+                baseTransform.position = MirrorPositionCircle;
+
+            // Add mirror script to the pose controller
+            var poseController = _mirrorBigAvatarGO.GetComponent<MultiplayerAvatarPoseController>();
+            var internalPoseController =
+                poseController.GetField<AvatarPoseController, MultiplayerAvatarPoseController>("_avatarPoseController");
+
+            if (!_config.InvertMirror)
+            {
+                var mirrorScript = _mirrorBigAvatarGO.gameObject.AddComponent<PoseMirrorScript>();
+                mirrorScript.Init(internalPoseController);
+
+                HandSwapper.ApplySwap(internalPoseController.gameObject, true);
+            }
+
+            // Animate hide or appear
+            _mirrorBigAvatarAnimator = _mirrorBigAvatarGO.GetComponent<MultiplayerBigAvatarAnimator>();
+            _mirrorBigAvatarAnimator.name = MirroredAnimatorName;
+            _mirrorBigAvatarAnimator.HideInstant();
+
+            if (_config.ForceSelfHologram)
+                _mirrorBigAvatarAnimator.Animate(true, 1f, EaseType.OutBack);
+        }
+
+        private void DestroyMirrorPlayerIfActive()
+        {
+            if (_mirrorPlayerGO == null)
+                return;
+
+            UnityEngine.Object.Destroy(_mirrorPlayerGO);
+
+            _mirrorPlayerGO = null;
+            _mirrorBigAvatarGO = null;
+            _mirrorBigAvatarAnimator = null;
+        }
+
         #endregion
     }
 }

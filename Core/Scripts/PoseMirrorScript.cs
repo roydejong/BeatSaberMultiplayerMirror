@@ -2,7 +2,7 @@
 
 namespace MultiplayerMirror.Core.Scripts
 {
-    public class CustomAvatarPoseMirror : MonoBehaviour
+    public class PoseMirrorScript : MonoBehaviour
     {
         private AvatarPoseController? _avatarPoseController;
 

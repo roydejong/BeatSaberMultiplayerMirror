@@ -1,6 +1,5 @@
 ﻿using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
-using MultiplayerMirror.Events;
 
 namespace MultiplayerMirror.UI
 {
@@ -15,7 +14,7 @@ namespace MultiplayerMirror.UI
             {
                 Plugin.Config!.EnableLobbyMirror = value;
                 NotifyPropertyChanged();
-                ModEvents.RaiseConfigChanged(this);
+                Plugin.Config.TriggerChangeEvent(this);
             }
         } 
         
@@ -27,7 +26,7 @@ namespace MultiplayerMirror.UI
             {
                 Plugin.Config!.EnableSelfHologram = value;
                 NotifyPropertyChanged();
-                ModEvents.RaiseConfigChanged(this);
+                Plugin.Config.TriggerChangeEvent(this);
             }
         } 
         
@@ -39,7 +38,19 @@ namespace MultiplayerMirror.UI
             {
                 Plugin.Config!.ForceSelfHologram = value;
                 NotifyPropertyChanged();
-                ModEvents.RaiseConfigChanged(this);
+                Plugin.Config.TriggerChangeEvent(this);
+            }
+        } 
+        
+        [UIValue("EnableDuelHologram")]
+        public bool EnableDuelHologram
+        {
+            get => Plugin.Config!.EnableDuelHologram;
+            set
+            {
+                Plugin.Config!.EnableDuelHologram = value;
+                NotifyPropertyChanged();
+                Plugin.Config.TriggerChangeEvent(this);
             }
         } 
         
@@ -51,7 +62,7 @@ namespace MultiplayerMirror.UI
             {
                 Plugin.Config!.InvertMirror = value;
                 NotifyPropertyChanged();
-                ModEvents.RaiseConfigChanged(this);
+                Plugin.Config.TriggerChangeEvent(this);
             }
         } 
         #endregion
@@ -88,6 +99,20 @@ namespace MultiplayerMirror.UI
             else
             {
                 ForceSelfHologram = false;   
+            }
+        }
+
+        [UIAction("SetEnableDuelHologram")]
+        public void SetEnableDuelHologram(bool value)
+        {
+            if (value)
+            {
+                EnableSelfHologram = true;
+                EnableDuelHologram = true;   
+            }
+            else
+            {
+                EnableDuelHologram = false;   
             }
         }
 
