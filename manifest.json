@@ -3,7 +3,7 @@
   "id": "MultiplayerMirror",
   "name": "MultiplayerMirror",
   "author": "LookAtHippo",
-  "version": "0.1.3",
+  "version": "1.0.0",
   "description": [
     "#![MultiplayerMirror.description.md]",
     "Adds mirror options for your multiplayer avatar in the lobby and game."
