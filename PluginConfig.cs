@@ -20,6 +20,10 @@ namespace MultiplayerMirror
         /// </summary>
         public virtual bool ForceSelfHologram { get; set; } = true;
         /// <summary>
+        /// If enabled, allow self-hologram in duel (1v1) multiplayer layout.
+        /// </summary>
+        public virtual bool EnableDuelHologram { get; set; } = true;
+        /// <summary>
         /// If true, do not apply mirror script, so your left and right are flipped from the mirror.
         /// </summary>
         public virtual bool InvertMirror { get; set; } = false;

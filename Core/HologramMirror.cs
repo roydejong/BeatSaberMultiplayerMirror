@@ -14,6 +14,8 @@ namespace MultiplayerMirror.Core
     public class HologramMirror : IInitializable, IDisposable, IAffinity
     {
         private const string MirroredAnimatorName = "MultiplayerMirrorHologramAnimator";
+        private static readonly Vector3 MirrorPositionCircle = new(0f, -1.5f, 50f);
+        private static readonly Vector3 MirrorPositionDuel = new(0f, -1.5f, 60f);
 
         [Inject] private readonly SiraLog _log = null!;
         [Inject] private readonly PluginConfig _config = null!;
@@ -26,6 +28,7 @@ namespace MultiplayerMirror.Core
         private GameObject? _mirrorPlayerGO = null;
         private GameObject? _mirrorBigAvatarGO = null;
         private MultiplayerBigAvatarAnimator? _mirrorBigAvatarAnimator = null;
+        private MultiplayerPlayerLayout _layout = MultiplayerPlayerLayout.NotDetermined;
 
         public void Initialize()
         {
@@ -49,7 +52,7 @@ namespace MultiplayerMirror.Core
 
         private void HandlePlayersSpawned()
         {
-            if (!_config.EnableSelfHologram)
+            if (!_config.EnableSelfHologram || (_layout == MultiplayerPlayerLayout.Duel && !_config.EnableDuelHologram))
                 // Self-hologram option is not enabled
                 return;
 
@@ -111,8 +114,8 @@ namespace MultiplayerMirror.Core
         [AffinityPatch(typeof(MultiplayerBigAvatarAnimator), nameof(MultiplayerBigAvatarAnimator.Animate))]
         private bool PrefixBigAvatarAnimate(MultiplayerBigAvatarAnimator __instance)
         {
-            if (_config.ForceSelfHologram)
-                // Not in forced mode, no-op
+            if (!_config.EnableSelfHologram || !_config.ForceSelfHologram)
+                // Not enabled or not in forced mode, let code run as normal
                 return true;
 
             if (__instance.gameObject.name == MirroredAnimatorName)
@@ -124,6 +127,14 @@ namespace MultiplayerMirror.Core
             return false;
         }
 
+
+        [AffinityPostfix]
+        [AffinityPatch(typeof(MultiplayerPlayersManager), nameof(MultiplayerPlayersManager.BindPlayerFactories))]
+        private void HandleBindPlayerFactories(MultiplayerPlayerLayout layout)
+        {
+            _log.Info($"Multiplayer layout was determined (MultiplayerPlayerLayout={layout})");
+            _layout = layout;
+        }
         #endregion
 
         #region Mirror facade
@@ -175,7 +186,10 @@ namespace MultiplayerMirror.Core
             // Rotate big avatar so it faces the player
             var baseTransform = _mirrorBigAvatarGO.transform;
             baseTransform.Rotate(0f, 180f, 0f);
-            baseTransform.position = new Vector3(0f, -1.5f, 50f);
+            if (_layout == MultiplayerPlayerLayout.Duel)
+                baseTransform.position = MirrorPositionDuel;
+            else
+                baseTransform.position = MirrorPositionCircle;
 
             // Add mirror script to the pose controller
             var poseController = _mirrorBigAvatarGO.GetComponent<MultiplayerAvatarPoseController>();

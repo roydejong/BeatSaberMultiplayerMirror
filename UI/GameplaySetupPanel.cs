@@ -42,6 +42,18 @@ namespace MultiplayerMirror.UI
             }
         } 
         
+        [UIValue("EnableDuelHologram")]
+        public bool EnableDuelHologram
+        {
+            get => Plugin.Config!.EnableDuelHologram;
+            set
+            {
+                Plugin.Config!.EnableDuelHologram = value;
+                NotifyPropertyChanged();
+                Plugin.Config.TriggerChangeEvent(this);
+            }
+        } 
+        
         [UIValue("InvertMirror")]
         public bool InvertMirror
         {
@@ -87,6 +99,20 @@ namespace MultiplayerMirror.UI
             else
             {
                 ForceSelfHologram = false;   
+            }
+        }
+
+        [UIAction("SetEnableDuelHologram")]
+        public void SetEnableDuelHologram(bool value)
+        {
+            if (value)
+            {
+                EnableSelfHologram = true;
+                EnableDuelHologram = true;   
+            }
+            else
+            {
+                EnableDuelHologram = false;   
             }
         }
 
