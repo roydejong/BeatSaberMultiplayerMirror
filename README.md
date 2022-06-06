@@ -1,17 +1,23 @@
-# Multiplayer Mirror
+<h1>
+    <img src="https://raw.github.com/roydejong/BeatSaberMultiplayerMirror/main/Assets/icon.png" height="32"/>
+    <span>Beat Saber Multiplayer Mirror (PC)</span>
+</h1>
 
-🙋‍ **Beat Saber mod that adds mirror options for your multiplayer avatar.**
+**Beat Saber mod that adds mirror options for your multiplayer avatar.**
 
-Have you ever wondered if you look as cool in multiplayer as you think you do? Do you love looking at yourself in the
-mirror? Have you ever wanted to kiss your own avatar? This mod is here for you.
+
 
 ![Multiplayer Mirror](https://user-images.githubusercontent.com/6772638/136465227-bb4b0d5e-b1e0-49ca-8317-b2a24d4d524e.png)
 
 ## Features
+Multiplayer Mirror adds options for seeing your own multiplayer avatar:
 
-Multiplayer Mirror adds options for seeing your own multiplayer avatar.
+- Mirror yourself in the lobby
+- Mirror yourself as a Hologram during matches
+  - In normal mode: Only when you're in 1st place, for a free dopamine boost
+  - In forced mode: Always feel like a winner even when you're not
 
-These effects are only visible to you. They work on any multiplayer server and lobby type.
+👀 These effects are only visible to you. They work on any multiplayer server and lobby type.
 
 👉 You can toggle these options in the mod's gameplay modifiers panel (on the left in the lobby, under *Mods* → *Multiplayer Mirror*).
 
@@ -36,11 +42,11 @@ Release**](https://github.com/roydejong/BeatSaberMultiplayerMirror/releases/late
 
 ### Requirements
 
-- Beat Saber 1.20 or compatible
+- Beat Saber 1.20, 1.21, 1.22 or compatible
 - Mods installed with [Mod Assistant](https://github.com/Assistant/ModAssistant):
-    - BSIPA 4.2.1+
-    - BeatSaberMarkupLanguage 1.6.1+
-    - SiraUtil 3.0.4+
+    - BSIPA
+    - BeatSaberMarkupLanguage
+    - SiraUtil
 
 ## Usage notes
 
