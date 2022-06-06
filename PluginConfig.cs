@@ -18,7 +18,7 @@ namespace MultiplayerMirror
         /// <summary>
         /// If enabled, force self-hologram in multiplayer matches, never showing other player's avatars.
         /// </summary>
-        public virtual bool ForceSelfHologram { get; set; } = true;
+        public virtual bool ForceSelfHologram { get; set; } = false;
         /// <summary>
         /// If enabled, allow self-hologram in duel (1v1) multiplayer layout.
         /// </summary>
