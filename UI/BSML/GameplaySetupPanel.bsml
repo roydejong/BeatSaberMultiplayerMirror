@@ -1,5 +1,5 @@
-<bg child-expand-width="true" min-width="120">
-  <modifier-container child-expand-width="true" min-width="120">    
+<bg child-expand-width="true" min-width="80" max-width="100" preferred-width="80">
+  <vertical id="mainRoot" preferred-width="80" child-expand-width="true" vertical-fit="PreferredSize">    
   
     <toggle-setting
       id="EnableLobbyMirror"
@@ -8,6 +8,7 @@
       bind-value="true"
       text="Enable Lobby Mirror"
       hover-hint="Show a mirror avatar of yourself in the lobby."
+      interactable="~EnableLobbyMirrorInteractable"
     />
 
     <horizontal pad-top="5"/>
@@ -19,6 +20,7 @@
       bind-value="true"
       text="Enable Self Hologram"
       hover-hint="When you're in 1st place, show a mirror hologram of yourself."
+      interactable="~EnableSelfHologramInteractable"
     />
     <toggle-setting
       id="ForceSelfHologram"
@@ -27,6 +29,7 @@
       bind-value="true"
       text="Always show Self Hologram"
       hover-hint="Always show a mirror hologram of yourself during gameplay, no matter what place you're in."
+      interactable="~ForceSelfHologramInteractable"
     />
     <toggle-setting
       id="EnableDuelHologram"
@@ -35,6 +38,7 @@
       bind-value="true"
       text="Show Duel Self Hologram"
       hover-hint="Enable Self Hologram for the Duel layout (1v1)."
+      interactable="~EnableDuelHologramInteractable"
     />
     
     <horizontal pad-top="5"/>
@@ -46,7 +50,8 @@
       bind-value="true"
       text="Invert mirror"
       hover-hint="Invert your mirrored avatar, so left/right positions are flipped, like it is on the results screen."
+      interactable="~InvertMirrorInteractable"
     />
     
-  </modifier-container>
+  </vertical>
 </bg>

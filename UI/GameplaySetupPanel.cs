@@ -5,7 +5,8 @@ namespace MultiplayerMirror.UI
 {
     public class GameplaySetupPanel : NotifiableSingleton<GameplaySetupPanel>
     {
-        #region Values
+        #region Bindings - Values
+
         [UIValue("EnableLobbyMirror")]
         public bool EnableLobbyMirror
         {
@@ -13,11 +14,14 @@ namespace MultiplayerMirror.UI
             set
             {
                 Plugin.Config!.EnableLobbyMirror = value;
+
                 NotifyPropertyChanged();
+                NotifyInteractablePropertiesChanged();
+
                 Plugin.Config.TriggerChangeEvent(this);
             }
-        } 
-        
+        }
+
         [UIValue("EnableSelfHologram")]
         public bool EnableSelfHologram
         {
@@ -25,11 +29,14 @@ namespace MultiplayerMirror.UI
             set
             {
                 Plugin.Config!.EnableSelfHologram = value;
+
                 NotifyPropertyChanged();
+                NotifyInteractablePropertiesChanged();
+
                 Plugin.Config.TriggerChangeEvent(this);
             }
-        } 
-        
+        }
+
         [UIValue("ForceSelfHologram")]
         public bool ForceSelfHologram
         {
@@ -37,11 +44,14 @@ namespace MultiplayerMirror.UI
             set
             {
                 Plugin.Config!.ForceSelfHologram = value;
+
                 NotifyPropertyChanged();
+                NotifyInteractablePropertiesChanged();
+
                 Plugin.Config.TriggerChangeEvent(this);
             }
-        } 
-        
+        }
+
         [UIValue("EnableDuelHologram")]
         public bool EnableDuelHologram
         {
@@ -49,11 +59,14 @@ namespace MultiplayerMirror.UI
             set
             {
                 Plugin.Config!.EnableDuelHologram = value;
+
                 NotifyPropertyChanged();
+                NotifyInteractablePropertiesChanged();
+
                 Plugin.Config.TriggerChangeEvent(this);
             }
-        } 
-        
+        }
+
         [UIValue("InvertMirror")]
         public bool InvertMirror
         {
@@ -61,59 +74,59 @@ namespace MultiplayerMirror.UI
             set
             {
                 Plugin.Config!.InvertMirror = value;
+
                 NotifyPropertyChanged();
+                NotifyInteractablePropertiesChanged();
+
                 Plugin.Config.TriggerChangeEvent(this);
             }
-        } 
+        }
+
+        #endregion
+
+        #region Bindings - Interactable
+
+        [UIValue("EnableLobbyMirrorInteractable")]
+        public bool EnableLobbyMirrorInteractable => true;
+
+        [UIValue("EnableSelfHologramInteractable")]
+        public bool EnableSelfHologramInteractable => true;
+
+        [UIValue("ForceSelfHologramInteractable")]
+        public bool ForceSelfHologramInteractable => EnableSelfHologram;
+
+        [UIValue("EnableDuelHologramInteractable")]
+        public bool EnableDuelHologramInteractable => EnableSelfHologram;
+
+        [UIValue("InvertMirrorInteractable")]
+        public bool InvertMirrorInteractable => EnableLobbyMirror || EnableSelfHologram;
+
         #endregion
 
         #region Actions
+
         [UIAction("SetEnableLobbyMirror")]
         public void SetEnableLobbyMirror(bool value)
         {
-            EnableLobbyMirror = value;   
+            EnableLobbyMirror = value;
         }
 
         [UIAction("SetEnableSelfHologram")]
         public void SetEnableSelfHologram(bool value)
         {
-            if (value)
-            {
-                EnableSelfHologram = true;    
-            }
-            else
-            {
-                EnableSelfHologram = false;
-                ForceSelfHologram = false;   
-            }
+            EnableSelfHologram = value;
         }
 
         [UIAction("SetForceSelfHologram")]
         public void SetForceSelfHologram(bool value)
         {
-            if (value)
-            {
-                EnableSelfHologram = true;
-                ForceSelfHologram = true;   
-            }
-            else
-            {
-                ForceSelfHologram = false;   
-            }
+            ForceSelfHologram = value;
         }
 
         [UIAction("SetEnableDuelHologram")]
         public void SetEnableDuelHologram(bool value)
         {
-            if (value)
-            {
-                EnableSelfHologram = true;
-                EnableDuelHologram = true;   
-            }
-            else
-            {
-                EnableDuelHologram = false;   
-            }
+            EnableDuelHologram = value;
         }
 
         [UIAction("SetInvertMirror")]
@@ -121,6 +134,20 @@ namespace MultiplayerMirror.UI
         {
             InvertMirror = value;
         }
+
+        #endregion
+
+        #region Utils
+
+        private void NotifyInteractablePropertiesChanged()
+        {
+            NotifyPropertyChanged("EnableLobbyMirrorInteractable");
+            NotifyPropertyChanged("EnableSelfHologramInteractable");
+            NotifyPropertyChanged("ForceSelfHologramInteractable");
+            NotifyPropertyChanged("EnableDuelHologramInteractable");
+            NotifyPropertyChanged("InvertMirrorInteractable");
+        }
+
         #endregion
     }
 }
