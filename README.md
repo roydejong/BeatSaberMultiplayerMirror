@@ -42,7 +42,7 @@ Release**](https://github.com/roydejong/BeatSaberMultiplayerMirror/releases/late
 
 ### Requirements
 
-- Beat Saber 1.20, 1.21, 1.22 or compatible
+- Beat Saber 1.20 - 1.27 or compatible *(this mod has never broken... so far!)*
 - Mods installed with [Mod Assistant](https://github.com/Assistant/ModAssistant):
     - BSIPA
     - BeatSaberMarkupLanguage
