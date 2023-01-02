@@ -33,22 +33,23 @@ Multiplayer Mirror adds options for seeing your own multiplayer avatar:
 
 ## Installation
 
+This mod is currently only available for PC.
+
+[**✅ Download the latest release**](https://github.com/roydejong/BeatSaberMultiplayerMirror/releases/latest)
+
 Download the mod, and place `MultiplayerMirror.dll` in your Beat Saber `Plugins` folder.
 
-### Download
-
-You can download the [**✅ Latest Stable
-Release**](https://github.com/roydejong/BeatSaberMultiplayerMirror/releases/latest) from GitHub.
-
 ### Requirements
-
-- Beat Saber 1.20 - 1.27 or compatible *(this mod has never broken... so far!)*
-- Mods installed with [Mod Assistant](https://github.com/Assistant/ModAssistant):
-    - BSIPA
-    - BeatSaberMarkupLanguage
-    - SiraUtil
+Beat Saber 1.20 - 1.27 or compatible, with these mods (available on [Mod Assistant](https://github.com/Assistant/ModAssistant)):
+  - BSIPA
+  - SiraUtil
+  - BeatSaberMarkupLanguage (BSML)
 
 ## Usage notes
 
 ### MultiplayerExtensions
 If you turn off Holograms in MultiplayerExtensions, that setting will be ignored if you enable a self hologram in this mod.
+
+## See also
+
+- [BeatSaberAvatarExtras](https://github.com/roydejong/BeatSaberAvatarExtras) - Add more customization options for your avatar!
