@@ -33,14 +33,16 @@ Multiplayer Mirror adds options for seeing your own multiplayer avatar:
 
 ## Installation
 
-This mod is currently only available for PC.
+This mod is currently only available for PCVR.
 
 [**✅ Download the latest release**](https://github.com/roydejong/BeatSaberMultiplayerMirror/releases/latest)
 
 Download the mod, and place `MultiplayerMirror.dll` in your Beat Saber `Plugins` folder.
 
+If the mod is installed correctly, you'll see yourself the next time you jump in a multiplayer lobby!
+
 ### Requirements
-Beat Saber 1.20 - 1.27 or compatible, with these mods (available on [Mod Assistant](https://github.com/Assistant/ModAssistant)):
+Beat Saber 1.29.4 or compatible, with these mods (available on [Mod Assistant](https://github.com/Assistant/ModAssistant)):
   - BSIPA
   - SiraUtil
   - BeatSaberMarkupLanguage (BSML)
