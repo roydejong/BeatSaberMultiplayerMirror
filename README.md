@@ -12,10 +12,11 @@
 ## Features
 Multiplayer Mirror adds options for seeing your own multiplayer avatar:
 
-- Mirror yourself in the lobby
-- Mirror yourself as a Hologram during matches
-  - In normal mode: Only when you're in 1st place, for a free dopamine boost
-  - In forced mode: Always feel like a winner even when you're not
+- In the avatar editor!
+- In the lobby!
+- As a hologram during matches:
+  - Normal mode: When you're in 1st place *(free dopamine boost)*
+  - Forced mode: Always feel like a winner even when you're not
 
 👀 These effects are only visible to you. They work on any multiplayer server and lobby type.
 

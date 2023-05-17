@@ -27,5 +27,9 @@ namespace MultiplayerMirror
         /// If true, do not apply mirror script, so your left and right are flipped from the mirror.
         /// </summary>
         public virtual bool InvertMirror { get; set; } = false;
+        /// <summary>
+        /// Enables mirror mode when changing your avatar in the menu.
+        /// </summary>
+        public virtual bool EnablePreviewMirror { get; set; } = true;
     }
 }
