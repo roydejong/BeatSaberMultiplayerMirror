@@ -51,7 +51,7 @@ namespace MultiplayerMirror.Core
 
         #region Patches
 
-        [AffinityPatch(typeof(MultiplayerLobbyAvatarManager), nameof(MultiplayerLobbyAvatarManager.AddPlayer))]
+        [AffinityPatch(typeof(MultiplayerLobbyAvatarManager), "AddPlayer")]
         [AffinityPostfix]
         private void HandleLobbyAvatarAdded(IConnectedPlayer connectedPlayer)
         {
@@ -96,7 +96,7 @@ namespace MultiplayerMirror.Core
 
             // Next, we'll ask the lobby avatar manager to spawn its avatar
             // This will run do everything including playing the spawn animation
-            _lobbyAvatarManager.AddPlayer(_mockPlayer);
+            _lobbyAvatarManager.InvokeMethod<object, MultiplayerLobbyAvatarManager>("AddPlayer", _mockPlayer);
             // Once complete our HandleLobbyAvatarAdded() postfix will run again for the 2nd step
             return true;
         }
@@ -152,7 +152,7 @@ namespace MultiplayerMirror.Core
             if (_mockPlayer is null)
                 return;
 
-            _lobbyAvatarManager.RemovePlayer(_mockPlayer);
+            _lobbyAvatarManager.InvokeMethod<object, MultiplayerLobbyAvatarManager>("RemovePlayer", _mockPlayer);
 
             _mockPlayer = null;
             _mockAvatarController = null;

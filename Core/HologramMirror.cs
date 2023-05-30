@@ -95,7 +95,7 @@ namespace MultiplayerMirror.Core
         #region Patches
 
         [AffinityPostfix]
-        [AffinityPatch(typeof(MultiplayerBigAvatarAnimator), nameof(MultiplayerBigAvatarAnimator.InitIfNeeded))]
+        [AffinityPatch(typeof(MultiplayerBigAvatarAnimator), "InitIfNeeded")]
         [AffinityAfter("com.github.Goobwabber.MultiplayerExtensions")]
         private void PostfixBigAvatarInit(MultiplayerBigAvatarAnimator __instance)
         {
@@ -129,7 +129,7 @@ namespace MultiplayerMirror.Core
 
 
         [AffinityPostfix]
-        [AffinityPatch(typeof(MultiplayerPlayersManager), nameof(MultiplayerPlayersManager.BindPlayerFactories))]
+        [AffinityPatch(typeof(MultiplayerPlayersManager), "BindPlayerFactories")]
         private void HandleBindPlayerFactories(MultiplayerPlayerLayout layout)
         {
             _log.Info($"Multiplayer layout was determined (MultiplayerPlayerLayout={layout})");

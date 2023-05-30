@@ -14,7 +14,7 @@ namespace MultiplayerMirror.Core
         
         private GameObject? _animatedAvatar = null;
 
-        [AffinityPatch(typeof(EditAvatarViewController), nameof(EditAvatarViewController.RefreshUi))]
+        [AffinityPatch(typeof(EditAvatarViewController), "RefreshUi")]
         [AffinityPostfix]
         public void PostfixRefreshUi(EditAvatarViewController __instance)
         {

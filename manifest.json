@@ -8,9 +8,9 @@
     "#![MultiplayerMirror.description.md]",
     "Adds mirror options for your multiplayer avatar in the lobby and game."
   ],
-  "gameVersion": "1.29.4",
+  "gameVersion": "1.30.0",
   "dependsOn": {
-    "BSIPA": "^4.2.1",
+    "BSIPA": "^4.3.0",
     "BeatSaberMarkupLanguage": "^1.6.1",
     "SiraUtil": "^3.0.4"
   },
