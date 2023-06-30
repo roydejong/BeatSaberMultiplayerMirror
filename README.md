@@ -43,10 +43,10 @@ Download the mod, and place `MultiplayerMirror.dll` in your Beat Saber `Plugins`
 If the mod is installed correctly, you'll see yourself the next time you jump in a multiplayer lobby!
 
 ### Requirements
-Beat Saber 1.29.4 or compatible, with these mods (available on [Mod Assistant](https://github.com/Assistant/ModAssistant)):
+Beat Saber 1.31.0 or compatible, with these mods (available on [Mod Assistant](https://github.com/Assistant/ModAssistant)):
   - BSIPA
   - SiraUtil
-  - BeatSaberMarkupLanguage (BSML)
+  - BeatSaberMarkupLanguage (BSML) v1.7.5+
 
 ## Usage notes
 
