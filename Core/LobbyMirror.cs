@@ -20,9 +20,10 @@ namespace MultiplayerMirror.Core
 
         private IConnectedPlayer? _selfPlayer;
         private IConnectedPlayer? _mockPlayer;
-        private MultiplayerLobbyAvatarController? _avatarController;
-        private GameObject? _mockPlayerAvatarGO;
+        private MultiplayerLobbyAvatarController? _lobbyAvatarController;
+        private AvatarController? _newAvatarController;
         private MirrorPoseDataProvider? _poseDataProvider;
+        private bool _pendingAvatarLoad;
 
         public void Initialize()
         {
@@ -38,11 +39,11 @@ namespace MultiplayerMirror.Core
 
         private void HandleConfigChange(object sender, EventArgs e)
         {
-            var hasAvatar = _avatarController != null;
+            var hasAvatar = _lobbyAvatarController != null;
 
             if (_config.EnableLobbyMirror)
                 if (hasAvatar)
-                    RefreshInvertMirror();
+                    ApplyInvertAndSwap();
                 else
                     CreateMirrorAvatarIfPossible();
             else
@@ -109,59 +110,49 @@ namespace MultiplayerMirror.Core
             if (_selfPlayer is null || _mockPlayer is null)
                 return;
 
-            _avatarController = TryGetAvatarController(_mockPlayer.userId);
+            _lobbyAvatarController = TryGetAvatarController(_mockPlayer.userId);
 
-            if (_avatarController is null)
+            if (_lobbyAvatarController is null)
                 return;
 
-            var mockTransform = _avatarController.gameObject.transform;
+            var mockTransform = _lobbyAvatarController.gameObject.transform;
 
             // Tweak position and rotation so it faces the local player
-            _avatarController.ShowSpawnAnimation(MirrorSpawnPos, MirrorSpawnRot);
+            _lobbyAvatarController.ShowSpawnAnimation(MirrorSpawnPos, MirrorSpawnRot);
 
             // Disable name tag (to avoid timing issues with spawn coroutine, just disable all its children)
             foreach (Transform tfChild in mockTransform.Find("AvatarCaption"))
                 tfChild.gameObject.SetActive(false);
 
             // Connect base avatar pose controller to the local player's
-            var poseController = _avatarController.gameObject.GetComponent<MultiplayerAvatarPoseController>();
+            var poseController = _lobbyAvatarController.gameObject.GetComponent<MultiplayerAvatarPoseController>();
             poseController.connectedPlayer = _selfPlayer;
             poseController.enabled = true; // pose controller self disables on init when player is not set // TODO this may do nothing, check
             
             // Replace pose data provider - BeatAvatar uses this, and we can do mirror magic through it
-            var newAvatarController = _avatarController.gameObject.GetComponent<AvatarController>();
-            if (newAvatarController._poseDataProvider is ConnectedPlayerAvatarPoseDataProvider poseProvider)
+            _newAvatarController = _lobbyAvatarController.gameObject.GetComponent<AvatarController>();
+            if (_newAvatarController._poseDataProvider is ConnectedPlayerAvatarPoseDataProvider poseProvider)
             {
                 _poseDataProvider = new MirrorPoseDataProvider(_selfPlayer, poseProvider);
-                newAvatarController.SetField<AvatarController, IAvatarPoseDataProvider>("_poseDataProvider", _poseDataProvider); // SetField because readonly
+                _newAvatarController.SetField<AvatarController, IAvatarPoseDataProvider>("_poseDataProvider", _poseDataProvider); // SetField because readonly
             }
             
             // The underlying avatar is probably not loaded; but just in case, ensure it uses our pose provider
-            if (newAvatarController.avatar != null)
-                newAvatarController.avatar.SetPoseDataProvider(_poseDataProvider);
-            
-            
-            // var poseDataProvider = basicAvatarController._poseDataProvider;
-            // basicAvatarController.avatar.SetPoseDataProvider(poseDataProvider);
+            if (_newAvatarController.avatar != null)
+                _newAvatarController.avatar.SetPoseDataProvider(_poseDataProvider);
+            else
+                _pendingAvatarLoad = true;
 
-            // Enable actual mirror effect - this script mirrors position and rotation
-            // _mockMirrorScript = _avatarController.gameObject.AddComponent<PoseMirrorScript>();
-            // var internalAvatarPoseController =
-            //     poseController.GetField<AvatarPoseController, MultiplayerAvatarPoseController>("_avatarPoseController");
-            // _mockPlayerAvatarGO = internalAvatarPoseController.gameObject;
-            // _mockMirrorScript.Init(internalAvatarPoseController);
-            
-            // Apply "InvertMirror"
-            RefreshInvertMirror();
+            ApplyInvertAndSwap();
         }
 
-        private void RefreshInvertMirror()
+        private void ApplyInvertAndSwap()
         {
             if (_poseDataProvider is not null)
                 _poseDataProvider.EnableMirror = !_config.InvertMirror;
             
-            if (_mockPlayerAvatarGO != null)
-                HandSwapper.ApplySwap(_mockPlayerAvatarGO, !_config.InvertMirror);
+            if (_newAvatarController != null && _newAvatarController.avatar != null)
+                HandSwapper.ApplySwap(_newAvatarController.avatar.gameObject, !_config.InvertMirror);
         }
 
         private void DestroyMirrorAvatarIfActive()
@@ -172,9 +163,10 @@ namespace MultiplayerMirror.Core
             _lobbyAvatarManager.RemovePlayer(_mockPlayer);
 
             _mockPlayer = null;
-            _avatarController = null;
+            _lobbyAvatarController = null;
+            _newAvatarController = null;
             _poseDataProvider = null;
-            _mockPlayerAvatarGO = null;
+            _pendingAvatarLoad = false;
         }
         #endregion
 
@@ -209,8 +201,14 @@ namespace MultiplayerMirror.Core
 
         public void Tick()
         {
-            if (_poseDataProvider is null || _avatarController is null)
+            if (_poseDataProvider == null || _newAvatarController == null)
                 return;
+
+            if (_pendingAvatarLoad && _newAvatarController.avatar != null)
+            {
+                ApplyInvertAndSwap();
+                _pendingAvatarLoad = false;
+            }
             
             _poseDataProvider.Tick();
         }
