@@ -10,7 +10,7 @@ using Zenject;
 
 namespace MultiplayerMirror.Core
 {
-    public class LobbyMirror : IInitializable, IDisposable, IAffinity
+    public class LobbyMirror : IInitializable, IDisposable, IAffinity, ITickable
     {
         private static readonly Vector3 MirrorSpawnPos = new(0.0f, 0.0f, 3.0f);
         private static readonly Quaternion MirrorSpawnRot = new(0f, 180f, 0f, 0f);
@@ -21,8 +21,8 @@ namespace MultiplayerMirror.Core
         private IConnectedPlayer? _selfPlayer;
         private IConnectedPlayer? _mockPlayer;
         private MultiplayerLobbyAvatarController? _avatarController;
-        private PoseMirrorScript? _mockMirrorScript;
         private GameObject? _mockPlayerAvatarGO;
+        private MirrorPoseDataProvider? _poseDataProvider;
 
         public void Initialize()
         {
@@ -128,13 +128,17 @@ namespace MultiplayerMirror.Core
             poseController.connectedPlayer = _selfPlayer;
             poseController.enabled = true; // pose controller self disables on init when player is not set // TODO this may do nothing, check
             
-            // Connect local player to pose data provider (for BeatAvatar)
+            // Replace pose data provider - BeatAvatar uses this, and we can do mirror magic through it
             var newAvatarController = _avatarController.gameObject.GetComponent<AvatarController>();
             if (newAvatarController._poseDataProvider is ConnectedPlayerAvatarPoseDataProvider poseProvider)
             {
-                // SetField because the field is marked as readonly
-                poseProvider.SetField("_connectedPlayer", _selfPlayer);
+                _poseDataProvider = new MirrorPoseDataProvider(_selfPlayer, poseProvider);
+                newAvatarController.SetField<AvatarController, IAvatarPoseDataProvider>("_poseDataProvider", _poseDataProvider); // SetField because readonly
             }
+            
+            // The underlying avatar is probably not loaded; but just in case, ensure it uses our pose provider
+            if (newAvatarController.avatar != null)
+                newAvatarController.avatar.SetPoseDataProvider(_poseDataProvider);
             
             
             // var poseDataProvider = basicAvatarController._poseDataProvider;
@@ -153,8 +157,8 @@ namespace MultiplayerMirror.Core
 
         private void RefreshInvertMirror()
         {
-            if (_mockMirrorScript is not null)
-                _mockMirrorScript.enabled = !_config.InvertMirror;
+            if (_poseDataProvider is not null)
+                _poseDataProvider.EnableMirror = !_config.InvertMirror;
             
             if (_mockPlayerAvatarGO != null)
                 HandSwapper.ApplySwap(_mockPlayerAvatarGO, !_config.InvertMirror);
@@ -165,11 +169,11 @@ namespace MultiplayerMirror.Core
             if (_mockPlayer is null)
                 return;
 
-            _lobbyAvatarManager.InvokeMethod<object, MultiplayerLobbyAvatarManager>("RemovePlayer", _mockPlayer);
+            _lobbyAvatarManager.RemovePlayer(_mockPlayer);
 
             _mockPlayer = null;
             _avatarController = null;
-            _mockMirrorScript = null;
+            _poseDataProvider = null;
             _mockPlayerAvatarGO = null;
         }
         #endregion
@@ -202,5 +206,13 @@ namespace MultiplayerMirror.Core
         }
 
         #endregion
+
+        public void Tick()
+        {
+            if (_poseDataProvider is null || _avatarController is null)
+                return;
+            
+            _poseDataProvider.Tick();
+        }
     }
 }
