@@ -1,5 +1,6 @@
 ﻿using System;
 using BeatSaber.AvatarCore;
+using MultiplayerMirror.Core.Helpers;
 using UnityEngine;
 
 namespace MultiplayerMirror.Core.Scripts
@@ -61,12 +62,12 @@ namespace MultiplayerMirror.Core.Scripts
 
             if (EnableMirror)
             {
-                headPos = MirrorPosition(headPos);
-                leftPos = MirrorPosition(leftPos);
-                rightPos = MirrorPosition(rightPos);
-                headRot = MirrorRotation(headRot);
-                leftRot = MirrorRotation(leftRot);
-                rightRot = MirrorRotation(rightRot);
+                headPos = MirrorUtil.MirrorPosition(headPos);
+                leftPos = MirrorUtil.MirrorPosition(leftPos);
+                rightPos = MirrorUtil.MirrorPosition(rightPos);
+                headRot = MirrorUtil.MirrorRotation(headRot);
+                leftRot = MirrorUtil.MirrorRotation(leftRot);
+                rightRot = MirrorUtil.MirrorRotation(rightRot);
             }
 
             if (RestrictPose)
@@ -83,11 +84,5 @@ namespace MultiplayerMirror.Core.Scripts
             );
             poseDidChangeEvent(currentPose);
         }
-
-        private static Quaternion MirrorRotation(Quaternion rotation) =>
-            new(rotation.x, -rotation.y, -rotation.z, rotation.w);
-
-        private static Vector3 MirrorPosition(Vector3 position) =>
-            new(-position.x, position.y, position.z);
     }
 }

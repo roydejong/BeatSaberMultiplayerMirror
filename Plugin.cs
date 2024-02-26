@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using BeatSaberMarkupLanguage.GameplaySetup;
+﻿using BeatSaberMarkupLanguage.GameplaySetup;
 using IPA;
 using IPA.Config.Stores;
 using MultiplayerMirror.Core.Installers;
@@ -41,16 +40,14 @@ namespace MultiplayerMirror
             zenjector.Install<MpMirrorAppInstaller>(Location.App);
             zenjector.Install<MpMirrorMenuInstaller>(Location.Menu);
             zenjector.Install<MpMirrorMultiPlayerInstaller>(Location.MultiplayerCore);
-
-            // Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), "BeatSaberMultiplayerMirror");
         }
         
         [OnEnable]
         public void OnEnable()
         {
             // Install Harmony patches
-            _harmony?.PatchAll(Assembly.GetExecutingAssembly());
-
+            _harmony!.PatchAll();
+            
             // Add gameplay setup tab
             GameplaySetup.instance.AddTab(
                 name: "Multiplayer Mirror", 
