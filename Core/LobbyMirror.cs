@@ -22,7 +22,7 @@ namespace MultiplayerMirror.Core
         private IConnectedPlayer? _mockPlayer;
         private MultiplayerLobbyAvatarController? _lobbyAvatarController;
         private AvatarController? _newAvatarController;
-        private MirrorPoseDataProvider? _poseDataProvider;
+        private MirrorAvatarPoseDataProvider? _poseDataProvider;
         private bool _pendingAvatarLoad;
 
         public void Initialize()
@@ -133,7 +133,7 @@ namespace MultiplayerMirror.Core
             _newAvatarController = _lobbyAvatarController.gameObject.GetComponent<AvatarController>();
             if (_newAvatarController._poseDataProvider is ConnectedPlayerAvatarPoseDataProvider poseProvider)
             {
-                _poseDataProvider = new MirrorPoseDataProvider(_selfPlayer, poseProvider);
+                _poseDataProvider = new MirrorAvatarPoseDataProvider(_selfPlayer, poseProvider);
                 _newAvatarController.SetField<AvatarController, IAvatarPoseDataProvider>("_poseDataProvider", _poseDataProvider); // SetField because readonly
             }
             

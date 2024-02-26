@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerMirror.Core.Scripts
 {
-    public class MirrorPoseDataProvider : IAvatarPoseDataProvider
+    public class MirrorAvatarPoseDataProvider : IAvatarPoseDataProvider
     {
         public bool EnableMirror { get; set; }
         public bool RestrictPose { get; set; }
@@ -17,7 +17,7 @@ namespace MultiplayerMirror.Core.Scripts
         
         public event Action<AvatarPoseData> poseDidChangeEvent = null!;
         
-        public MirrorPoseDataProvider(IConnectedPlayer localPlayer, INodePoseSyncStateManager nodePoseSyncStateManager, 
+        public MirrorAvatarPoseDataProvider(IConnectedPlayer localPlayer, INodePoseSyncStateManager nodePoseSyncStateManager, 
             IAvatarPoseRestriction avatarPoseRestriction)
         {
             EnableMirror = true;
@@ -30,7 +30,7 @@ namespace MultiplayerMirror.Core.Scripts
             LocalPlayer = localPlayer;
         }
 
-        public MirrorPoseDataProvider(IConnectedPlayer localPlayer, ConnectedPlayerAvatarPoseDataProvider baseProvider)
+        public MirrorAvatarPoseDataProvider(IConnectedPlayer localPlayer, ConnectedPlayerAvatarPoseDataProvider baseProvider)
             : this(localPlayer, baseProvider._nodePoseSyncStateManager, baseProvider._avatarPoseRestriction)
         {
         }
@@ -84,14 +84,10 @@ namespace MultiplayerMirror.Core.Scripts
             poseDidChangeEvent(currentPose);
         }
 
-        private static Quaternion MirrorRotation(Quaternion rotation)
-        {
-            return new Quaternion(rotation.x, -rotation.y, -rotation.z, rotation.w);
-        }
+        private static Quaternion MirrorRotation(Quaternion rotation) =>
+            new(rotation.x, -rotation.y, -rotation.z, rotation.w);
 
-        private static Vector3 MirrorPosition(Vector3 position)
-        {
-            return new Vector3(-position.x, position.y, position.z);
-        }
+        private static Vector3 MirrorPosition(Vector3 position) =>
+            new(-position.x, position.y, position.z);
     }
 }

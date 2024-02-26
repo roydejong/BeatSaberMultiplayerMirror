@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Linq;
+using BeatSaber.AvatarCore;
 using IPA.Utilities;
+using MultiplayerMirror.Core.Helpers;
+using MultiplayerMirror.Core.Scripts;
 using SiraUtil.Affinity;
 using SiraUtil.Logging;
 using UnityEngine;
@@ -8,7 +11,7 @@ using Zenject;
 
 namespace MultiplayerMirror.Core
 {
-    public class HologramMirror : IInitializable, IDisposable, IAffinity
+    public class HologramMirror : IInitializable, IDisposable, IAffinity, ITickable
     {
         private const string MirroredAnimatorName = "MultiplayerMirrorHologramAnimator";
         private static readonly Vector3 MirrorPositionCircle = new(0f, -1.5f, 50f);
@@ -24,8 +27,12 @@ namespace MultiplayerMirror.Core
         private IConnectedPlayer? _selfPlayer = null;
         private GameObject? _mirrorPlayerGO = null;
         private GameObject? _mirrorBigAvatarGO = null;
+        private AvatarController? _newAvatarController;
         private MultiplayerBigAvatarAnimator? _mirrorBigAvatarAnimator = null;
         private MultiplayerPlayerLayout _layout = MultiplayerPlayerLayout.NotDetermined;
+        private MirrorAvatarPoseController? _poseController;
+        private MirrorAvatarPoseDataProvider? _poseDataProvider;
+        private bool _pendingAvatarLoad;
 
         public void Initialize()
         {
@@ -177,7 +184,7 @@ namespace MultiplayerMirror.Core
 
         private void ConfigureBigAvatar()
         {
-            if (_mirrorBigAvatarGO == null)
+            if (_mirrorBigAvatarGO == null || _selfPlayer == null)
                 return;
 
             // Rotate big avatar so it faces the player
@@ -188,14 +195,30 @@ namespace MultiplayerMirror.Core
             else
                 baseTransform.position = MirrorPositionCircle;
 
-            // Add mirror script to the pose controller
-            // TODO New mirror solution
-            if (!_config.InvertMirror)
+            // Replace pose controller (mostly for sabers)
+            var multiplayerAvatarPoseController = _mirrorBigAvatarGO.GetComponent<MultiplayerAvatarPoseController>();
+            multiplayerAvatarPoseController.enabled = false;
+            
+            _poseController = _mirrorBigAvatarGO.GetComponent<MirrorAvatarPoseController>();
+            if (_poseController == null)
+                _poseController = _mirrorBigAvatarGO.AddComponent<MirrorAvatarPoseController>();
+            _poseController.Init(_selfPlayer, multiplayerAvatarPoseController);
+            
+            // Replace pose data provider (for beat avatars)
+            _newAvatarController = _mirrorBigAvatarGO.GetComponent<AvatarController>();
+            if (_newAvatarController._poseDataProvider is ConnectedPlayerAvatarPoseDataProvider poseProvider)
             {
-                // var mirrorScript = _mirrorBigAvatarGO.gameObject.AddComponent<PoseMirrorScript>();
-                // mirrorScript.Init(internalPoseController);
-                // HandSwapper.ApplySwap(internalPoseController.gameObject, true);
-            }
+                _poseDataProvider = new MirrorAvatarPoseDataProvider(_selfPlayer, poseProvider);
+                _newAvatarController.SetField<AvatarController, IAvatarPoseDataProvider>("_poseDataProvider", _poseDataProvider); // SetField because readonly
+            }            
+            
+            // The underlying avatar is probably not loaded; but just in case, ensure it uses our pose provider
+            if (_newAvatarController.avatar != null)
+                _newAvatarController.avatar.SetPoseDataProvider(_poseDataProvider);
+            else
+                _pendingAvatarLoad = true;
+
+            ApplyInvertAndSwap();
 
             // Animate hide or appear
             _mirrorBigAvatarAnimator = _mirrorBigAvatarGO.GetComponent<MultiplayerBigAvatarAnimator>();
@@ -204,6 +227,15 @@ namespace MultiplayerMirror.Core
 
             if (_config.ForceSelfHologram)
                 _mirrorBigAvatarAnimator.Animate(true, 1f, EaseType.OutBack);
+        }
+        
+        private void ApplyInvertAndSwap()
+        {
+            if (_poseDataProvider is not null)
+                _poseDataProvider.EnableMirror = !_config.InvertMirror;
+            
+            if (_newAvatarController != null && _newAvatarController.avatar != null)
+                HandSwapper.ApplySwap(_newAvatarController.avatar.gameObject, !_config.InvertMirror);
         }
 
         private void DestroyMirrorPlayerIfActive()
@@ -216,8 +248,25 @@ namespace MultiplayerMirror.Core
             _mirrorPlayerGO = null;
             _mirrorBigAvatarGO = null;
             _mirrorBigAvatarAnimator = null;
+            _poseController = null;
+            _poseDataProvider = null;
+            _pendingAvatarLoad = false;
         }
 
         #endregion
+
+        public void Tick()
+        {
+            if (_poseDataProvider == null || _newAvatarController == null)
+                return;
+
+            if (_pendingAvatarLoad && _newAvatarController.avatar != null)
+            {
+                ApplyInvertAndSwap();
+                _pendingAvatarLoad = false;
+            }
+            
+            _poseDataProvider.Tick();
+        }
     }
 }
