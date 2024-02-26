@@ -2,7 +2,6 @@
 using BeatSaberMarkupLanguage.GameplaySetup;
 using IPA;
 using IPA.Config.Stores;
-using MultiplayerMirror.Core;
 using MultiplayerMirror.Core.Installers;
 using MultiplayerMirror.UI;
 using SiraUtil.Web.SiraSync;
@@ -42,6 +41,8 @@ namespace MultiplayerMirror
             zenjector.Install<MpMirrorAppInstaller>(Location.App);
             zenjector.Install<MpMirrorMenuInstaller>(Location.Menu);
             zenjector.Install<MpMirrorMultiPlayerInstaller>(Location.MultiplayerCore);
+
+            // Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), "BeatSaberMultiplayerMirror");
         }
         
         [OnEnable]

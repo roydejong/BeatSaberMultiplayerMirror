@@ -1,42 +1,20 @@
-﻿using UnityEngine;
+﻿using BeatSaber.BeatAvatarSDK;
+using UnityEngine;
 
 namespace MultiplayerMirror.Core.Scripts
 {
     public class PoseMirrorScript : MonoBehaviour
     {
-        private AvatarPoseController? _avatarPoseController;
+        private BeatAvatarPoseController? _avatarPoseController;
 
-        public void Init(AvatarPoseController avatarPoseController)
+        public void Init(BeatAvatarPoseController avatarPoseController)
         {
             _avatarPoseController = avatarPoseController;
             
-            if (enabled)
-                OnEnable();
-            else
-                OnDisable();
-        }
-        
-        public void OnEnable()
-        {
-            OnDisable();
-            
-            if (_avatarPoseController is null)
-                return;
-            
-            _avatarPoseController.earlyPositionsWillBeSetCallback += HandleAvatarPoseControllerPositionsWillBeSet;
-            _avatarPoseController.earlyRotationsWillBeSetCallback += HandleAvatarPoseControllerRotationsWillBeSet;
+            // TODO Figure out a patch to actually make this work, this event hook is no longer in the base game
         }
 
-        public void OnDisable()
-        {
-            if (_avatarPoseController is null)
-                return;
-            
-            _avatarPoseController.earlyPositionsWillBeSetCallback -= HandleAvatarPoseControllerPositionsWillBeSet;
-            _avatarPoseController.earlyRotationsWillBeSetCallback -= HandleAvatarPoseControllerRotationsWillBeSet;
-        }
-
-        private static void HandleAvatarPoseControllerPositionsWillBeSet(
+        public void MirrorPose(
             Vector3 headPosition,
             Vector3 leftHandPosition,
             Vector3 rightHandPosition,
@@ -49,7 +27,7 @@ namespace MultiplayerMirror.Core.Scripts
             newRightHandPosition = MirrorPosition(rightHandPosition);
         }
 
-        private static void HandleAvatarPoseControllerRotationsWillBeSet(
+        private void MirrorRotation(
             Quaternion headRotation,
             Quaternion leftHandRotation,
             Quaternion rightHandRotation,

@@ -15,6 +15,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
@@ -22,9 +26,25 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(BeatSaberDir)\Libs\0Harmony.dll</HintPath>
     </Reference>
-    <Reference Include="BGNet, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="BeatSaber.AvatarCore">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BGNet.dll</HintPath>
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.AvatarCore.dll</HintPath>
+      <Publicize>true</Publicize>
+    </Reference>
+    <Reference Include="BeatSaber.BeatAvatarAdapter">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.BeatAvatarAdapter.dll</HintPath>
+      <Publicize>true</Publicize>
+    </Reference>
+    <Reference Include="BeatSaber.BeatAvatarSDK">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.BeatAvatarSDK.dll</HintPath>
+      <Publicize>true</Publicize>
+    </Reference>
+    <Reference Include="BGNetCore">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BGNetCore.dll</HintPath>
+      <Publicize>true</Publicize>
     </Reference>
     <Reference Include="BSML, Version=1.5.8.0, Culture=neutral, PublicKeyToken=null">
       <SpecificVersion>False</SpecificVersion>
@@ -48,6 +68,7 @@
     <Reference Include="Main, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Main.dll</HintPath>
+      <Publicize>true</Publicize>
     </Reference>
     <Reference Include="SiraUtil, Version=3.0.4.0, Culture=neutral, PublicKeyToken=null">
       <SpecificVersion>False</SpecificVersion>
@@ -83,6 +104,10 @@
     <EmbeddedResource Include="Assets\icon.png" />
     <None Remove="description.md" />
     <EmbeddedResource Include="description.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Core\Patches\" />
   </ItemGroup>
 
 </Project>

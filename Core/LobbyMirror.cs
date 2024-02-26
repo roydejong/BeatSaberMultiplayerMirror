@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using BeatSaber.AvatarCore;
 using IPA.Utilities;
 using MultiplayerMirror.Core.Helpers;
 using MultiplayerMirror.Core.Scripts;
 using SiraUtil.Affinity;
-using SiraUtil.Logging;
 using UnityEngine;
 using Zenject;
 
@@ -20,7 +20,7 @@ namespace MultiplayerMirror.Core
 
         private IConnectedPlayer? _selfPlayer;
         private IConnectedPlayer? _mockPlayer;
-        private MultiplayerLobbyAvatarController? _mockAvatarController;
+        private MultiplayerLobbyAvatarController? _avatarController;
         private PoseMirrorScript? _mockMirrorScript;
         private GameObject? _mockPlayerAvatarGO;
 
@@ -38,7 +38,7 @@ namespace MultiplayerMirror.Core
 
         private void HandleConfigChange(object sender, EventArgs e)
         {
-            var hasAvatar = _mockPlayerAvatarGO != null;
+            var hasAvatar = _avatarController != null;
 
             if (_config.EnableLobbyMirror)
                 if (hasAvatar)
@@ -96,7 +96,7 @@ namespace MultiplayerMirror.Core
 
             // Next, we'll ask the lobby avatar manager to spawn its avatar
             // This will run do everything including playing the spawn animation
-            _lobbyAvatarManager.InvokeMethod<object, MultiplayerLobbyAvatarManager>("AddPlayer", _mockPlayer);
+            _lobbyAvatarManager.AddPlayer(_mockPlayer);
             // Once complete our HandleLobbyAvatarAdded() postfix will run again for the 2nd step
             return true;
         }
@@ -109,30 +109,43 @@ namespace MultiplayerMirror.Core
             if (_selfPlayer is null || _mockPlayer is null)
                 return;
 
-            _mockAvatarController = TryGetAvatarController(_mockPlayer.userId);
+            _avatarController = TryGetAvatarController(_mockPlayer.userId);
 
-            if (_mockAvatarController is null)
+            if (_avatarController is null)
                 return;
 
-            var mockTransform = _mockAvatarController.gameObject.transform;
+            var mockTransform = _avatarController.gameObject.transform;
 
             // Tweak position and rotation so it faces the local player
-            _mockAvatarController.ShowSpawnAnimation(MirrorSpawnPos, MirrorSpawnRot);
+            _avatarController.ShowSpawnAnimation(MirrorSpawnPos, MirrorSpawnRot);
 
             // Disable name tag (to avoid timing issues with spawn coroutine, just disable all its children)
             foreach (Transform tfChild in mockTransform.Find("AvatarCaption"))
                 tfChild.gameObject.SetActive(false);
 
-            // Connect mock player movement to our real player
-            var poseController = _mockAvatarController.gameObject.GetComponent<MultiplayerAvatarPoseController>();
+            // Connect base avatar pose controller to the local player's
+            var poseController = _avatarController.gameObject.GetComponent<MultiplayerAvatarPoseController>();
             poseController.connectedPlayer = _selfPlayer;
+            poseController.enabled = true; // pose controller self disables on init when player is not set // TODO this may do nothing, check
+            
+            // Connect local player to pose data provider (for BeatAvatar)
+            var newAvatarController = _avatarController.gameObject.GetComponent<AvatarController>();
+            if (newAvatarController._poseDataProvider is ConnectedPlayerAvatarPoseDataProvider poseProvider)
+            {
+                // SetField because the field is marked as readonly
+                poseProvider.SetField("_connectedPlayer", _selfPlayer);
+            }
+            
+            
+            // var poseDataProvider = basicAvatarController._poseDataProvider;
+            // basicAvatarController.avatar.SetPoseDataProvider(poseDataProvider);
 
             // Enable actual mirror effect - this script mirrors position and rotation
-            _mockMirrorScript = _mockAvatarController.gameObject.AddComponent<PoseMirrorScript>();
-            var internalAvatarPoseController =
-                poseController.GetField<AvatarPoseController, MultiplayerAvatarPoseController>("_avatarPoseController");
-            _mockPlayerAvatarGO = internalAvatarPoseController.gameObject;
-            _mockMirrorScript.Init(internalAvatarPoseController);
+            // _mockMirrorScript = _avatarController.gameObject.AddComponent<PoseMirrorScript>();
+            // var internalAvatarPoseController =
+            //     poseController.GetField<AvatarPoseController, MultiplayerAvatarPoseController>("_avatarPoseController");
+            // _mockPlayerAvatarGO = internalAvatarPoseController.gameObject;
+            // _mockMirrorScript.Init(internalAvatarPoseController);
             
             // Apply "InvertMirror"
             RefreshInvertMirror();
@@ -155,7 +168,7 @@ namespace MultiplayerMirror.Core
             _lobbyAvatarManager.InvokeMethod<object, MultiplayerLobbyAvatarManager>("RemovePlayer", _mockPlayer);
 
             _mockPlayer = null;
-            _mockAvatarController = null;
+            _avatarController = null;
             _mockMirrorScript = null;
             _mockPlayerAvatarGO = null;
         }
@@ -184,7 +197,7 @@ namespace MultiplayerMirror.Core
                 userName = $"Mirror#{basePlayer.userName}",
                 sortIndex = basePlayer.sortIndex
             }, false);
-            mockPlayer.SetProperty("multiplayerAvatarData", basePlayer.multiplayerAvatarData);
+            mockPlayer.multiplayerAvatarsData = basePlayer.multiplayerAvatarsData;
             return mockPlayer;
         }
 

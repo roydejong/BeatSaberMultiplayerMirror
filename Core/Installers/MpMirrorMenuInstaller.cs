@@ -7,7 +7,6 @@ namespace MultiplayerMirror.Core.Installers
         public override void InstallBindings()
         {
             Container.BindInterfacesAndSelfTo<LobbyMirror>().AsSingle();
-            Container.BindInterfacesAndSelfTo<PreviewMirror>().AsSingle();
         }
     }
 }

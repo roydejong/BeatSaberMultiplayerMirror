@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Linq;
 using IPA.Utilities;
-using MultiplayerMirror.Core.Helpers;
-using MultiplayerMirror.Core.Scripts;
 using SiraUtil.Affinity;
 using SiraUtil.Logging;
 using UnityEngine;
 using Zenject;
-using Object = System.Object;
 
 namespace MultiplayerMirror.Core
 {
@@ -192,16 +189,12 @@ namespace MultiplayerMirror.Core
                 baseTransform.position = MirrorPositionCircle;
 
             // Add mirror script to the pose controller
-            var poseController = _mirrorBigAvatarGO.GetComponent<MultiplayerAvatarPoseController>();
-            var internalPoseController =
-                poseController.GetField<AvatarPoseController, MultiplayerAvatarPoseController>("_avatarPoseController");
-
+            // TODO New mirror solution
             if (!_config.InvertMirror)
             {
-                var mirrorScript = _mirrorBigAvatarGO.gameObject.AddComponent<PoseMirrorScript>();
-                mirrorScript.Init(internalPoseController);
-
-                HandSwapper.ApplySwap(internalPoseController.gameObject, true);
+                // var mirrorScript = _mirrorBigAvatarGO.gameObject.AddComponent<PoseMirrorScript>();
+                // mirrorScript.Init(internalPoseController);
+                // HandSwapper.ApplySwap(internalPoseController.gameObject, true);
             }
 
             // Animate hide or appear
