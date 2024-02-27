@@ -1,5 +1,6 @@
 ﻿using BeatSaber.BeatAvatarAdapter.AvatarEditor;
 using BeatSaber.BeatAvatarSDK;
+using MultiplayerMirror.Core.Helpers;
 using MultiplayerMirror.Core.Scripts;
 using SiraUtil.Affinity;
 using UnityEngine;
@@ -81,6 +82,9 @@ namespace MultiplayerMirror.Core
                 _animatedAvatar.transform.position = _originalPosition.Value;
                 _originalPosition = null;
             }
+            
+            // Hand swap
+            HandSwapper.ApplySwap(playerAvatar, mirrorMode);
         }
 
         public void EnableMirrorPreview() => SetMirrorPreview(true);
