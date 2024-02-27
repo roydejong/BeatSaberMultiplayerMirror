@@ -14,6 +14,9 @@ namespace MultiplayerMirror.Core
         private BeatAvatarEditorFlowCoordinator? _editorFlowCoordinator;
         private BeatAvatarEditorViewController? _editorViewController;
         private GameObject? _animatedAvatar = null;
+        private Vector3? _originalPosition = null;
+        
+        public static readonly Vector3 PositionOffset = new Vector3(0, -0.25f, -1.5f);
 
         [AffinityPatch(typeof(BeatAvatarEditorFlowCoordinator), nameof(BeatAvatarEditorFlowCoordinator.DidActivate))]
         [AffinityPostfix]
@@ -66,6 +69,18 @@ namespace MultiplayerMirror.Core
             }
             menuUpdater.TargetPoseController = poseController;
             menuUpdater.enabled = mirrorMode;
+            
+            // Offset or restore original position as needed
+            if (mirrorMode && _originalPosition == null)
+            {
+                _originalPosition = _animatedAvatar.transform.position;
+                _animatedAvatar.transform.position = (_originalPosition.Value + PositionOffset);
+            }
+            else if (!mirrorMode && _originalPosition != null)
+            {
+                _animatedAvatar.transform.position = _originalPosition.Value;
+                _originalPosition = null;
+            }
         }
 
         public void EnableMirrorPreview() => SetMirrorPreview(true);
