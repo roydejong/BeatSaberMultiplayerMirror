@@ -217,7 +217,7 @@ namespace MultiplayerMirror.Core
                 _newAvatarController.avatar.SetPoseDataProvider(_poseDataProvider);
             else
                 _pendingAvatarLoad = true;
-
+            
             ApplyInvertAndSwap();
 
             // Animate hide or appear
@@ -262,6 +262,7 @@ namespace MultiplayerMirror.Core
 
             if (_pendingAvatarLoad && _newAvatarController.avatar != null)
             {
+                _newAvatarController.avatar.SetPoseDataProvider(_poseDataProvider);
                 ApplyInvertAndSwap();
                 _pendingAvatarLoad = false;
             }

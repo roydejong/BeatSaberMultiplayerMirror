@@ -30,8 +30,6 @@ namespace MultiplayerMirror.Core.Scripts
             LeftSaberTransform = leftSaberTransform;
             RightSaberTransform = rightSaberTransform;
             HeadTransform = headTransform;
-
-            LocalPlayer = localPlayer;
         }
 
         public void Init(IConnectedPlayer localPlayer, MultiplayerAvatarPoseController baseController)
@@ -43,17 +41,17 @@ namespace MultiplayerMirror.Core.Scripts
         public void Update()
         {
             if (NodePoseSyncStateManager == null || LocalPlayer == null)
+                // Init() not called yet
                 return;
-            
-            var syncStateForPlayer = NodePoseSyncStateManager.GetSyncState(0); // 0 returns local state fast
-            if (syncStateForPlayer == null || syncStateForPlayer.player != LocalPlayer)
-                // local state not (yet) available
+
+            var localState = NodePoseSyncStateManager.localState;
+            if (localState == null)
                 return;
 
             var offsetTime = LocalPlayer.offsetSyncTime;
-            var headPose = syncStateForPlayer.GetState(NodePoseSyncState.NodePose.Head, offsetTime);
-            var leftPose = syncStateForPlayer.GetState(NodePoseSyncState.NodePose.LeftController, offsetTime);
-            var rightPose = syncStateForPlayer.GetState(NodePoseSyncState.NodePose.RightController, offsetTime);
+            var headPose = localState.GetState(NodePoseSyncState.NodePose.Head, offsetTime);
+            var leftPose = localState.GetState(NodePoseSyncState.NodePose.LeftController, offsetTime);
+            var rightPose = localState.GetState(NodePoseSyncState.NodePose.RightController, offsetTime);
 
             Vector3 headPos = headPose.position;
             Vector3 leftPos = leftPose.position;

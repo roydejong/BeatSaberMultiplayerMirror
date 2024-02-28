@@ -27,8 +27,6 @@ namespace MultiplayerMirror.Core.Scripts
             LocalPlayer = localPlayer;
             NodePoseSyncStateManager = nodePoseSyncStateManager;
             AvatarPoseRestriction = avatarPoseRestriction;
-            
-            LocalPlayer = localPlayer;
         }
 
         public MirrorAvatarPoseDataProvider(IConnectedPlayer localPlayer, ConnectedPlayerAvatarPoseDataProvider baseProvider)
@@ -40,18 +38,17 @@ namespace MultiplayerMirror.Core.Scripts
         {
             // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
             if (poseDidChangeEvent == null)
-                // No one is listening :(
+                // No one is listening (yet) :(
                 return;
 
-            var syncStateForPlayer = NodePoseSyncStateManager.GetSyncState(0); // 0 returns local state fast
-            if (syncStateForPlayer == null || syncStateForPlayer.player != LocalPlayer)
-                // local state not (yet) available
+            var localState = NodePoseSyncStateManager.localState;
+            if (localState == null)
                 return;
 
             var offsetTime = LocalPlayer.offsetSyncTime;
-            var headPose = syncStateForPlayer.GetState(NodePoseSyncState.NodePose.Head, offsetTime);
-            var leftPose = syncStateForPlayer.GetState(NodePoseSyncState.NodePose.LeftController, offsetTime);
-            var rightPose = syncStateForPlayer.GetState(NodePoseSyncState.NodePose.RightController, offsetTime);
+            var headPose = localState.GetState(NodePoseSyncState.NodePose.Head, offsetTime);
+            var leftPose = localState.GetState(NodePoseSyncState.NodePose.LeftController, offsetTime);
+            var rightPose = localState.GetState(NodePoseSyncState.NodePose.RightController, offsetTime);
 
             Vector3 headPos = headPose.position;
             Vector3 leftPos = leftPose.position;
