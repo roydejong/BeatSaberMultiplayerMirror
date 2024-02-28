@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BeatSaber.BeatAvatarSDK;
+using MultiplayerMirror.Core.Helpers;
 using UnityEngine;
 using Zenject;
 
@@ -8,7 +9,7 @@ namespace MultiplayerMirror.Core.Scripts
     {
         [Inject] private readonly MenuPlayerController _menuPlayerController = null!;
 
-        public AvatarPoseController? TargetPoseController { get; set; } = null;
+        public BeatAvatarPoseController? TargetPoseController { get; set; } = null;
 
         public void LateUpdate()
         {
@@ -16,12 +17,12 @@ namespace MultiplayerMirror.Core.Scripts
                 return;
 
             TargetPoseController.UpdateTransforms(
-                _menuPlayerController.headPos,
-                _menuPlayerController.leftController.position,
-                _menuPlayerController.rightController.position,
-                _menuPlayerController.headRot,
-                _menuPlayerController.leftController.rotation,
-                _menuPlayerController.rightController.rotation
+                MirrorUtil.MirrorPosition(_menuPlayerController.headPos),
+                MirrorUtil.MirrorPosition(_menuPlayerController.leftController.position),
+                MirrorUtil.MirrorPosition(_menuPlayerController.rightController.position),
+                MirrorUtil.MirrorRotation(_menuPlayerController.headRot),
+                MirrorUtil.MirrorRotation(_menuPlayerController.leftController.rotation),
+                MirrorUtil.MirrorRotation(_menuPlayerController.rightController.rotation)
             );
         }
     }

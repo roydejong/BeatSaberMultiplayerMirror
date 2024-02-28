@@ -1,8 +1,6 @@
-﻿using System.Reflection;
-using BeatSaberMarkupLanguage.GameplaySetup;
+﻿using BeatSaberMarkupLanguage.GameplaySetup;
 using IPA;
 using IPA.Config.Stores;
-using MultiplayerMirror.Core;
 using MultiplayerMirror.Core.Installers;
 using MultiplayerMirror.UI;
 using SiraUtil.Web.SiraSync;
@@ -48,8 +46,8 @@ namespace MultiplayerMirror
         public void OnEnable()
         {
             // Install Harmony patches
-            _harmony?.PatchAll(Assembly.GetExecutingAssembly());
-
+            _harmony!.PatchAll();
+            
             // Add gameplay setup tab
             GameplaySetup.instance.AddTab(
                 name: "Multiplayer Mirror", 

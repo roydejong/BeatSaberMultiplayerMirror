@@ -1,5 +1,6 @@
-﻿using System;
-using IPA.Utilities;
+﻿using BeatSaber.BeatAvatarAdapter.AvatarEditor;
+using BeatSaber.BeatAvatarSDK;
+using MultiplayerMirror.Core.Helpers;
 using MultiplayerMirror.Core.Scripts;
 using SiraUtil.Affinity;
 using UnityEngine;
@@ -10,20 +11,35 @@ namespace MultiplayerMirror.Core
     public class PreviewMirror : IAffinity
     {
         [Inject] private readonly DiContainer _diContainer = null!;
-        [Inject] private readonly EditAvatarFlowCoordinator _editAvatarFlowCoordinator = null!;
         
+        private BeatAvatarEditorFlowCoordinator? _editorFlowCoordinator;
+        private BeatAvatarEditorViewController? _editorViewController;
         private GameObject? _animatedAvatar = null;
+        private Vector3? _originalPosition = null;
+        
+        public static readonly Vector3 PositionOffset = new Vector3(0, -0.25f, -1.5f);
 
-        [AffinityPatch(typeof(EditAvatarViewController), "RefreshUi")]
+        [AffinityPatch(typeof(BeatAvatarEditorFlowCoordinator), nameof(BeatAvatarEditorFlowCoordinator.DidActivate))]
         [AffinityPostfix]
-        public void PostfixRefreshUi(EditAvatarViewController __instance)
+        public void PostfixFlowDidActivate(BeatAvatarEditorFlowCoordinator __instance)
         {
             if (!Plugin.Config.EnablePreviewMirror)
                 return;
             
-            if (_animatedAvatar == null)
-                _animatedAvatar = _editAvatarFlowCoordinator.GetField<GameObject, EditAvatarFlowCoordinator>
-                    ("_avatarContainerGameObject");
+            _editorFlowCoordinator = __instance;
+        }
+
+        [AffinityPatch(typeof(BeatAvatarEditorViewController), nameof(BeatAvatarEditorViewController.RefreshUi))]
+        [AffinityPostfix]
+        public void PostfixRefreshUi(BeatAvatarEditorViewController __instance)
+        {
+            if (!Plugin.Config.EnablePreviewMirror)
+                return;
+
+            _editorViewController = __instance;
+            
+            if (_animatedAvatar == null && _editorFlowCoordinator != null)
+                _animatedAvatar = _editorFlowCoordinator._avatarContainerGameObject;
 
             EnableMirrorPreview();
         }
@@ -32,45 +48,43 @@ namespace MultiplayerMirror.Core
         {
             if (_animatedAvatar is null)
                 return;
-
-            // Get components and references
-            var animator = _animatedAvatar.GetComponent<Animator>();
-            var animatorPoseController = _animatedAvatar.GetComponent<AnimatedAvatarPoseController>();
-
-            var avatarPoseController =
-                animatorPoseController.GetField<AvatarPoseController, AnimatedAvatarPoseController>(
-                    "_avatarPoseController");
-
-            var menuPoseScript = _animatedAvatar.GetComponent<MenuPoseScript>();
-            var poseMirrorScript = _animatedAvatar.GetComponent<PoseMirrorScript>();
-
-            // Toggle default animation
-            animator.enabled = !mirrorMode;
-            animatorPoseController.enabled = !mirrorMode;
             
-            // Add/toggle custom scripts for mirror mode
-            if (mirrorMode)
+            // Toggle default animation
+            var animator = _animatedAvatar.GetComponent<Animator>();
+            animator.enabled = !mirrorMode;
+            
+            // Try get avatar object
+            var playerAvatar = _animatedAvatar.transform.Find("PlayerAvatar").gameObject;
+            if (playerAvatar == null)
+                return;
+            
+            var poseController = playerAvatar.GetComponent<BeatAvatarPoseController>();
+            if (poseController == null)
+                return;
+            
+            var menuUpdater = playerAvatar.GetComponent<MenuPoseScript>();
+            if (menuUpdater == null)
             {
-                if (menuPoseScript == null)
-                {
-                    menuPoseScript = _animatedAvatar.AddComponent<MenuPoseScript>();
-                    menuPoseScript.TargetPoseController = avatarPoseController;
-                    _diContainer.Inject(menuPoseScript);
-                }
-
-                if (poseMirrorScript == null)
-                {
-                    poseMirrorScript = _animatedAvatar.AddComponent<PoseMirrorScript>();
-                }
-
-                menuPoseScript.enabled = true;
-                poseMirrorScript.enabled = true;
+                menuUpdater = playerAvatar.AddComponent<MenuPoseScript>();
+                _diContainer.Inject(menuUpdater);
             }
-            else
+            menuUpdater.TargetPoseController = poseController;
+            menuUpdater.enabled = mirrorMode;
+            
+            // Offset or restore original position as needed
+            if (mirrorMode && _originalPosition == null)
             {
-                menuPoseScript.enabled = false;
-                poseMirrorScript.enabled = false;
+                _originalPosition = _animatedAvatar.transform.position;
+                _animatedAvatar.transform.position = (_originalPosition.Value + PositionOffset);
             }
+            else if (!mirrorMode && _originalPosition != null)
+            {
+                _animatedAvatar.transform.position = _originalPosition.Value;
+                _originalPosition = null;
+            }
+            
+            // Hand swap
+            HandSwapper.ApplySwap(playerAvatar, mirrorMode);
         }
 
         public void EnableMirrorPreview() => SetMirrorPreview(true);

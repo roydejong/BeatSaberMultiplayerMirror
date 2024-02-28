@@ -1,14 +1,11 @@
 # Multiplayer Mirror
-**This mod adds mirror options for your multiplayer avatar in lobbies and games.**
+**This mod adds mirror options for your multiplayer avatar in games, lobbies and the avatar editor.**
 
 ### Options
 You can control the options from the Gameplay Modifiers panel on the left in the lobby:
 
-- **Toggle Lobby Mirror**: Show a mirror avatar of yourself in the lobby.
-- **Enable Self Hologram**: When you're in 1st place during gameplay, show a mirror hologram of yourself.
-- **Force show Self Hologram**: Always show a mirror hologram of yourself during gameplay, no matter what place you're in.
-- **Invert mirror**: If enabled, flip left/right positions, like on the results screen. Affects both the lobby and hologram mirrors. 
-
-### Notes
-- Hologram mirror does not currently work on Duels (1v1 games)
-- This mod's features, when enabled, will override and ignore MultiplayerExtension's "Hologram" toggle
+- **Enable Lobby Mirror**: If enabled, you'll see an avatar mirror of yourself in the multiplayer lobby.
+- **Enable Self Hologram**: If enabled, you'll see a hologram of yourself in multiplayer games whenever you're in 1st place, just like other players would see.
+- **Always show Self Hologram**: If enabled, you'll always see your own hologram in game, no matter what place you're in.
+- **Show Duel Self Hologram**: If enabled, the Self Hologram will be shown in the Duel (1v1) layout as well.
+- **Invert mirror**: If enabled, your lobby and game mirrors will be inverted, like you are normally on the results screen.

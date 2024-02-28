@@ -3,16 +3,16 @@
   "id": "MultiplayerMirror",
   "name": "MultiplayerMirror",
   "author": "LookAtHippo",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": [
     "#![MultiplayerMirror.description.md]",
     "Adds mirror options for your multiplayer avatar in the lobby and game."
   ],
-  "gameVersion": "1.31.0",
+  "gameVersion": "1.34.6",
   "dependsOn": {
-    "BSIPA": "^4.3.0",
-    "BeatSaberMarkupLanguage": "^1.7.5",
-    "SiraUtil": "^3.0.4"
+    "BSIPA": "^4.3.2",
+    "SiraUtil": "^3.1.7",
+    "BeatSaberMarkupLanguage": "^1.9.0"
   },
   "icon": "MultiplayerMirror.Assets.icon.png",
   "links": {
