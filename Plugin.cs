@@ -1,8 +1,9 @@
-﻿using BeatSaberMarkupLanguage.GameplaySetup;
+﻿using HarmonyLib;
 using IPA;
+using IPA.Config;
 using IPA.Config.Stores;
+using JetBrains.Annotations;
 using MultiplayerMirror.Core.Installers;
-using MultiplayerMirror.UI;
 using SiraUtil.Web.SiraSync;
 using SiraUtil.Zenject;
 using IPALogger = IPA.Logging.Logger;
@@ -19,7 +20,7 @@ namespace MultiplayerMirror
 
         internal static IPALogger? Log { get; private set; }
 
-        private HarmonyLib.Harmony? _harmony;
+        private Harmony? _harmony;
 
         public Plugin() : base()
         {
@@ -27,10 +28,11 @@ namespace MultiplayerMirror
         }
         
         [Init]
-        public void Init(IPALogger logger, Zenjector zenjector, IPA.Config.Config config)
+        [UsedImplicitly]
+        public void Init(IPALogger logger, Zenjector zenjector, Config config)
         {
             Log = logger;
-            _harmony = new HarmonyLib.Harmony(HarmonyId);
+            _harmony = new Harmony(HarmonyId);
             Config = config.Generated<PluginConfig>();
 
             zenjector.UseMetadataBinder<Plugin>();
@@ -43,26 +45,17 @@ namespace MultiplayerMirror
         }
         
         [OnEnable]
+        [UsedImplicitly]
         public void OnEnable()
         {
             // Install Harmony patches
             _harmony!.PatchAll();
-            
-            // Add gameplay setup tab
-            GameplaySetup.instance.AddTab(
-                name: "Multiplayer Mirror", 
-                resource: "MultiplayerMirror.UI.BSML.GameplaySetupPanel.bsml",
-                host: GameplaySetupPanel.instance,
-                menuType: MenuType.Online
-            );
         }
         
         [OnDisable]
+        [UsedImplicitly]
         public void OnDisable()
         {
-            // Remove gameplay setup tab
-            GameplaySetup.instance.RemoveTab("Multiplayer Mirror");
-            
             // Remove Harmony patches
             _harmony?.UnpatchSelf();
         }
