@@ -9,7 +9,7 @@
 
 ## Features
 
-Multiplayer Mirror adds options for seeing your own multiplayer avatar:
+Multiplayer Mirror lets you see your own multiplayer avatar:
 
 - As the **1st place hologram** during matches
 - In the **lobby**
@@ -29,26 +29,22 @@ Multiplayer Mirror adds options for seeing your own multiplayer avatar:
 | **Always show Self Hologram** | If enabled, you'll always see your own hologram in game, no matter what place you're in.                                            |
 | **Show Duel Self Hologram**   | If enabled, the Self Hologram will be shown in the Duel (1v1) layout as well.                                                       |
 | **Invert mirror**             | If enabled, your lobby and game mirrors will be inverted, like you are normally on the results screen.                              |                                                                                        
-
 ## Installation
 
 This mod is currently only available for PCVR.
 
-[**✅ Download the latest release**](https://github.com/roydejong/BeatSaberMultiplayerMirror/releases/latest)
+💡 **The latest version is available for easy installation via [ModAssistant](https://github.com/bsmg/ModAssistant)!**
 
-Download the mod, and place `MultiplayerMirror.dll` in your Beat Saber `Plugins` folder.
+You can also manually [**✅ Download the latest release**](https://github.com/roydejong/BeatSaberMultiplayerMirror/releases/latest) if you prefer.
 
-If the mod is installed correctly, you'll see yourself the next time you jump in a multiplayer lobby!
+## Requirements
 
-### Requirements
+### ✅ Works with Beat Saber 1.38
 
-Beat Saber 1.34.5 / 1.34.6 or compatible, with these mods:
-
-- [BSIPA](https://github.com/nike4613/BeatSaber-IPA-Reloaded/releases): v4.3.2 or newer
-- [SiraUtil](https://github.com/Auros/SiraUtil/releases): v3.1.7 or newer
-- [BeatSaberMarkupLanguage](https://github.com/monkeymanboy/BeatSaberMarkupLanguage/releases): v1.9.0 or newer
-
-💡 All mods are usually available for easy installation on [Mod Assistant](https://github.com/Assistant/ModAssistant)).
+- Beat Saber: v1.38.0 or newer
+- [BSIPA](https://github.com/nike4613/BeatSaber-IPA-Reloaded/releases): v4.3.5 or newer
+- [SiraUtil](https://github.com/Auros/SiraUtil/releases): v3.1.12 or newer
+- [BeatSaberMarkupLanguage](https://github.com/monkeymanboy/BeatSaberMarkupLanguage/releases): v1.12.2 or newer
 
 ## Usage notes
 
